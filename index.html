@@ -522,10 +522,10 @@ const WAYPOINTS = [
   { km: 225, name: "Inizio Coppa Montelera",            type: "special",      lat: 44.9920, lon: 11.1310, alert: "INIZIO Coppa Montelera — 55 km prova speciale fino a Pontelagoscuro. Massima velocità. Massima concentrazione." },
   { km: 230, name: "Confluenza Panaro — da destra",     type: "confluence",   lat: 44.8892, lon: 11.4168, alert: "Confluenza Panaro da DESTRA. Siamo in Montelera. Proseguire dritti a massima velocità." },
   { km: 280, name: "Pontelagoscuro — Fine Montelera",   type: "special",      lat: 44.8680, lon: 11.5965, alert: "Fine Coppa Montelera. Ottimo lavoro. Ripresa andatura normale." },
-  { km: 295, name: "DELTA Po — ramificazioni",          type: "warning",      lat: 44.8035, lon: 11.9716, alert: "DELTA DEL PO — RAMIFICAZIONI. Attenzione massima. Seguire SOLO segnaletica ufficiale AIPO. Non decidere da soli." },
-  { km: 310, name: "Anse del delta",                    type: "curve_danger", lat: 44.9626, lon: 12.1001, alert: "Anse multiple del delta — velocità controllata. Secche tra anse. Tenersi esterno curva." },
-  { km: 340, name: "Ansa di Polesella",                 type: "curve_danger", lat: 44.9629, lon: 11.7830, alert: "Curva sinistra pronunciata a Polesella — corrente forte verso sponda esterna." },
-  { km: 370, name: "Avvicinamento Voltagrimana",        type: "warning",      lat: 44.8097, lon: 12.1480, alert: "Voltagrimana tra 20 km — fine tratto cronometrato si avvicina." },
+  { km: 295, name: "DELTA Po — ramificazioni",          type: "warning",      lat: 44.9534, lon: 12.0300, alert: "DELTA DEL PO — RAMIFICAZIONI. Attenzione massima. Seguire SOLO segnaletica ufficiale AIPO. Non decidere da soli." },
+  { km: 310, name: "Anse del delta",                    type: "curve_danger", lat: 44.9540, lon: 12.1450, alert: "Anse multiple del delta — velocità controllata. Secche tra anse. Tenersi esterno curva." },
+  { km: 340, name: "Ansa di Polesella",                 type: "curve_danger", lat: 44.9620, lon: 11.7480, alert: "Curva sinistra pronunciata a Polesella — corrente forte verso sponda esterna." },
+  { km: 370, name: "Avvicinamento Voltagrimana",        type: "warning",      lat: 44.9320, lon: 12.1950, alert: "Voltagrimana tra 20 km — fine tratto cronometrato si avvicina." },
   { km: 390, name: "Voltagrimana — Fine crono",         type: "timed_end",    lat: 44.9240, lon: 12.2254, alert: "Voltagrimana — tratto cronometrato TERMINATO. Classifica ufficiale. Bravi." },
   { km: 393, name: "Inizio trasferimento finale",       type: "transfer",     lat: 44.9080, lon: 12.2310, alert: "Trasferimento finale — canale Po-Brondolo. Tempo imposto. Navigazione calma." },
   { km: 410, name: "Brondolo — Chioggia",               type: "transfer",     lat: 45.2278, lon: 12.2760, alert: "Brondolo Chioggia. Canal di Valle. Quasi arrivati." },
@@ -961,25 +961,10 @@ function buildMappa() {
     crossOrigin: true,
   }).addTo(mappaLeaflet);
 
-  // ─── NO CONNECTING LINE between waypoints (per user: keep only the dots).
-  //       Waypoints sit on the real Po visible in the OSM tiles. ───
+  // NO lines at all — just colored markers on the real Po visible in OSM tiles.
+  // The Montelera (km 225-280) and final transfer (km 390-413) sections are
+  // communicated via waypoint COLORS (gold for cronometer / special, green for start/finish).
   const routeCoords = WAYPOINTS.map(w => [w.lat, w.lon]);
-
-  // ─── Coppa Montelera overlay (km 225 → 280) gold ───
-  const mtlCoords = WAYPOINTS.filter(w => w.km >= 225 && w.km <= 280).map(w => [w.lat, w.lon]);
-  if (mtlCoords.length > 1) {
-    L.polyline(mtlCoords, {
-      color: '#D4A017', weight: 7, opacity: 0.65, lineCap: 'round',
-    }).addTo(mappaLeaflet);
-  }
-
-  // ─── Final transfer (km 390 → 413) dashed green ───
-  const trCoords = WAYPOINTS.filter(w => w.km >= 390).map(w => [w.lat, w.lon]);
-  if (trCoords.length > 1) {
-    L.polyline(trCoords, {
-      color: '#2E7D32', weight: 4, opacity: 0.75, dashArray: '8,6', lineCap: 'round',
-    }).addTo(mappaLeaflet);
-  }
 
   // ─── Waypoint markers with our severity styling ───
   WAYPOINTS.forEach((w, i) => {
@@ -1244,7 +1229,7 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   const swCode = `
-const CACHE = 'raid-pv-v9';
+const CACHE = 'raid-pv-v10';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap'
 ];
