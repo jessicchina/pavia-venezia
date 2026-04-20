@@ -921,17 +921,25 @@ function mappaTypeLabel(w) {
 function buildMappa() {
   const container = document.getElementById('leaflet-map');
 
-  // First open? Initialize. Otherwise just ensure size is right.
+  // If map already exists, just ensure size is right
   if (mappaLeaflet) {
-    setTimeout(() => mappaLeaflet.invalidateSize(), 50);
+    mappaLeaflet.invalidateSize();
+    const coords = WAYPOINTS.map(w => [w.lat, w.lon]);
+    if (coords.length > 1) mappaLeaflet.fitBounds(coords, { padding: [25, 25] });
     updateMappaPosition();
     return;
   }
 
   if (typeof L === 'undefined') {
-    // Leaflet not loaded yet — wait and retry
     container.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">Caricamento mappa...</div>';
     setTimeout(buildMappa, 300);
+    return;
+  }
+
+  // Container must have non-zero size before Leaflet initialization
+  const rect = container.getBoundingClientRect();
+  if (rect.width < 20 || rect.height < 20) {
+    setTimeout(buildMappa, 100);
     return;
   }
 
@@ -1052,8 +1060,22 @@ function updateMappaPosition() {
 }
 
 function showMappa() {
-  buildMappa();
+  // Open panel FIRST so the leaflet container has real dimensions
   document.getElementById('mappa-panel').classList.add('open');
+  // Wait two animation frames for layout to settle, then build/refresh the map
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      buildMappa();
+      // Safety: invalidate + refit after a short delay in case tiles loaded late
+      setTimeout(() => {
+        if (mappaLeaflet) {
+          mappaLeaflet.invalidateSize();
+          const coords = WAYPOINTS.map(w => [w.lat, w.lon]);
+          if (coords.length > 1) mappaLeaflet.fitBounds(coords, { padding: [25, 25] });
+        }
+      }, 250);
+    });
+  });
 }
 function hideMappa() {
   document.getElementById('mappa-panel').classList.remove('open');
@@ -1226,7 +1248,7 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   const swCode = `
-const CACHE = 'raid-pv-v7';
+const CACHE = 'raid-pv-v8';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap'
 ];
