@@ -37,7 +37,9 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   html, body {
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh; /* dvh = dynamic viewport — avoids iOS Safari URL bar overlap */
     background: var(--bg);
     color: var(--white);
     font-family: 'Barlow Condensed', sans-serif;
@@ -46,9 +48,15 @@
   }
 
   #app {
-    width: 100vw; height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
     display: flex; flex-direction: column;
     position: relative; overflow: hidden;
+    /* Safe-area insets so content doesn't go under Safari's home-bar or notch */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: border-box;
   }
 
   /* ─── TOP STRIP ─── */
@@ -145,23 +153,27 @@
 
   /* ─── BOTTOM BUTTONS ─── */
   #bottom-bar {
-    display: flex; gap: 8px; padding: 8px 12px;
+    display: flex; gap: 6px; padding: 8px 10px;
     background: var(--bg2); border-top: 1px solid rgba(255,255,255,0.06);
     flex-shrink: 0;
+    /* Extra bottom padding for iOS home-bar safe area (beyond the #app padding) */
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   }
   .btn {
-    flex: 1; padding: 12px 8px;
+    flex: 1; padding: 10px 4px;
     border: none; border-radius: 10px;
-    font-family: 'Barlow Condensed'; font-size: 14px; font-weight: 900;
-    letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+    font-family: 'Barlow Condensed'; font-size: 12px; font-weight: 900;
+    letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer;
     transition: opacity 0.15s;
+    min-width: 0; /* allow flex shrink on narrow screens */
   }
   .btn:active { opacity: 0.7; }
-  #btn-secca { background: var(--red); color: white; font-size: 13px; }
+  #btn-secca { background: var(--red); color: white; font-size: 11px; }
   #btn-secca.active { animation: flashRed 0.4s infinite alternate; }
-  #btn-panel { background: var(--bg3); color: var(--cyan); border: 1px solid rgba(0,212,255,0.3); }
-  #btn-demo { background: var(--bg3); color: var(--gold); border: 1px solid rgba(255,215,0,0.3); font-size: 12px; }
-  #btn-sos { flex: 0 0 auto; padding: 12px 18px; background: var(--red); color: white; font-size: 16px; border-radius: 10px; border: none; font-family: 'Barlow Condensed'; font-weight: 900; letter-spacing: 1px; cursor: pointer; }
+  #btn-mappa { background: var(--bg3); color: var(--green); border: 1px solid rgba(0,255,136,0.3); font-size: 11px; }
+  #btn-panel { background: var(--bg3); color: var(--cyan); border: 1px solid rgba(0,212,255,0.3); font-size: 11px; }
+  #btn-demo { background: var(--bg3); color: var(--gold); border: 1px solid rgba(255,215,0,0.3); font-size: 10px; }
+  #btn-sos { flex: 0 0 auto; padding: 10px 12px; background: var(--red); color: white; font-size: 14px; border-radius: 10px; border: none; font-family: 'Barlow Condensed'; font-weight: 900; letter-spacing: 1px; cursor: pointer; }
 
   /* ─── SEGNALETICA PANEL ─── */
   #segnaletica-panel {
@@ -205,6 +217,48 @@
   .wpt-km { width: 38px; font-size: 13px; font-weight: 800; color: var(--muted); }
   .wpt-name { flex: 1; font-weight: 700; }
   .wpt-type-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ─── MAPPA PO PANEL ─── */
+  #mappa-panel {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--bg); z-index: 101;
+    display: none; flex-direction: column;
+    padding: 12px 10px 10px;
+  }
+  #mappa-panel.open { display: flex; }
+  #mappa-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0; }
+  #mappa-title { font-size: 15px; font-weight: 900; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; }
+  #mappa-close { font-size: 28px; color: var(--muted); cursor: pointer; background: none; border: none; font-family: 'Barlow Condensed'; padding: 0 8px; line-height: 1; }
+  #mappa-svg-wrap {
+    flex: 1; position: relative; overflow: hidden;
+    background: #0a1220; border: 1px solid rgba(0,212,255,0.15); border-radius: 8px;
+    min-height: 0;
+  }
+  #mappa-svg { width: 100%; height: 100%; display: block; }
+  #mappa-info {
+    flex-shrink: 0; padding: 10px; margin-top: 8px;
+    background: var(--bg3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
+    min-height: 64px; font-size: 13px; line-height: 1.35;
+  }
+  #mappa-info.empty { color: var(--muted); text-align: center; font-style: italic; }
+  #mappa-info-km { font-size: 11px; font-weight: 800; color: var(--muted); letter-spacing: 1px; }
+  #mappa-info-name { font-size: 15px; font-weight: 900; color: var(--white); margin: 3px 0; }
+  #mappa-info-alert { font-size: 12px; color: var(--cyan); font-weight: 600; }
+  #mappa-legend {
+    flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 8px 14px;
+    margin-top: 6px; padding: 6px 4px; font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px;
+  }
+  .mappa-leg-item { display: flex; align-items: center; gap: 4px; }
+  .mappa-leg-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .mappa-leg-sq { width: 9px; height: 9px; border-radius: 2px; }
+  .mappa-me-pulse {
+    animation: mePulse 1.2s ease-out infinite;
+    transform-origin: center;
+  }
+  @keyframes mePulse {
+    0% { opacity: 0.8; r: 6; }
+    100% { opacity: 0; r: 18; }
+  }
 
   /* ─── GPS SIGNAL INDICATOR ─── */
   .gps-ok { color: var(--green); }
@@ -318,6 +372,7 @@
   <!-- Bottom buttons -->
   <div id="bottom-bar">
     <button class="btn" id="btn-secca" onclick="toggleSecca()">🚨 SECCA<br>MANUALE</button>
+    <button class="btn" id="btn-mappa" onclick="showMappa()">🗺 MAPPA<br>PO</button>
     <button class="btn" id="btn-panel" onclick="showSegnaletica()">📋 SEGNI<br>ACQUA</button>
     <button class="btn" id="btn-demo" onclick="toggleDemo()">▶ DEMO<br>MODE</button>
     <button id="btn-sos" onclick="callSOS()">🆘 SOS</button>
@@ -343,6 +398,26 @@
     <div id="wptlist-title">📍 Tappe Percorso</div>
     <button id="wptlist-close" onclick="hideWptList()">✕</button>
     <div id="wptlist-scroll"></div>
+  </div>
+
+  <!-- Mappa Po panel -->
+  <div id="mappa-panel">
+    <div id="mappa-header">
+      <div id="mappa-title">🗺 Mappa Po · 413 km</div>
+      <button id="mappa-close" onclick="hideMappa()">✕</button>
+    </div>
+    <div id="mappa-svg-wrap">
+      <svg id="mappa-svg" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+    <div id="mappa-info" class="empty">Tocca un waypoint per vederne i dettagli</div>
+    <div id="mappa-legend">
+      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#ff3b3b"></span>CRITICO</div>
+      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#ff6b35"></span>ALTO/ATTENZIONE</div>
+      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#ffb020"></span>CONFLUENZA</div>
+      <div class="mappa-leg-item"><span class="mappa-leg-sq" style="background:#ff6b35"></span>FERMATA</div>
+      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#ffd700"></span>CRONO/SPECIALE</div>
+      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#00d4ff;box-shadow:0 0 6px #00d4ff"></span>QUI (GPS)</div>
+    </div>
   </div>
 
 </div>
@@ -601,6 +676,9 @@ function updateDisplay(kmCovered, speedKmh) {
 
   // Next waypoint
   updateNextWaypoint(kmCovered);
+
+  // Update map "you are here" if map panel is open (no-op otherwise)
+  if (typeof updateMappaPosition === 'function') updateMappaPosition();
 }
 
 function updateNextWaypoint(kmCovered) {
@@ -744,6 +822,165 @@ function buildWptList() {
   });
 }
 function hideWptList() { document.getElementById('wptlist-panel').classList.remove('open'); }
+
+// ═══════════════════════════════════════════════
+// MAPPA PO — SVG map with waypoints + "you are here"
+// ═══════════════════════════════════════════════
+const MAPPA_VB = { w: 1000, h: 260, padX: 20, padY: 30 };
+
+function mappaProject(lat, lon) {
+  // Compute bbox of all waypoints
+  const lats = WAYPOINTS.map(w => w.lat);
+  const lons = WAYPOINTS.map(w => w.lon);
+  const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+  const minLon = Math.min(...lons), maxLon = Math.max(...lons);
+  const dLat = maxLat - minLat || 1e-6;
+  const dLon = maxLon - minLon || 1e-6;
+  const x = MAPPA_VB.padX + ((lon - minLon) / dLon) * (MAPPA_VB.w - 2 * MAPPA_VB.padX);
+  const y = MAPPA_VB.padY + ((maxLat - lat) / dLat) * (MAPPA_VB.h - 2 * MAPPA_VB.padY);
+  return { x, y };
+}
+
+function mappaSeverity(w) {
+  // Returns: color, size, shape for each waypoint
+  const CRIT = [9, 67, 128, 295, 310];
+  if (CRIT.includes(w.km)) return { color: '#ff3b3b', r: 9, shape: 'circle' };
+  if (w.type === 'stop' || w.type === 'lock' || w.type === 'fuel') return { color: '#ff6b35', r: 8, shape: 'square' };
+  if (w.type === 'confluence') return { color: '#ffb020', r: 7, shape: 'triangle' };
+  if (w.type === 'curve_danger' || w.type === 'warning' || w.type === 'secca') return { color: '#ff6b35', r: 6, shape: 'circle' };
+  if (w.type === 'special' || w.type === 'start' || w.type === 'timed_start' || w.type === 'timed_end' || w.type === 'finish') return { color: '#ffd700', r: 7, shape: 'star' };
+  return { color: '#00d4ff', r: 5, shape: 'circle' };
+}
+
+function mappaShapeSvg(shape, cx, cy, r, color) {
+  if (shape === 'square') return `<rect x="${cx-r}" y="${cy-r}" width="${r*2}" height="${r*2}" fill="${color}" stroke="white" stroke-width="1.2"/>`;
+  if (shape === 'triangle') {
+    const p = `${cx},${cy-r*1.15} ${cx-r},${cy+r*0.7} ${cx+r},${cy+r*0.7}`;
+    return `<polygon points="${p}" fill="${color}" stroke="white" stroke-width="1.2"/>`;
+  }
+  if (shape === 'star') {
+    let pts = [];
+    for (let i = 0; i < 10; i++) {
+      const a = -Math.PI/2 + i * Math.PI/5;
+      const rr = (i % 2 === 0) ? r*1.2 : r*0.55;
+      pts.push(`${cx + rr*Math.cos(a)},${cy + rr*Math.sin(a)}`);
+    }
+    return `<polygon points="${pts.join(' ')}" fill="${color}" stroke="white" stroke-width="1"/>`;
+  }
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" stroke="white" stroke-width="1.2"/>`;
+}
+
+function buildMappa() {
+  const svg = document.getElementById('mappa-svg');
+  svg.setAttribute('viewBox', `0 0 ${MAPPA_VB.w} ${MAPPA_VB.h}`);
+
+  // River polyline through all waypoints
+  const pathPts = WAYPOINTS.map(w => { const p = mappaProject(w.lat, w.lon); return `${p.x.toFixed(1)},${p.y.toFixed(1)}`; }).join(' ');
+
+  // Montelera highlight (gold over-line)
+  const mtl = WAYPOINTS.filter(w => w.km >= 225 && w.km <= 280)
+    .map(w => { const p = mappaProject(w.lat, w.lon); return `${p.x.toFixed(1)},${p.y.toFixed(1)}`; }).join(' ');
+  // Final transfer (dashed green)
+  const tr = WAYPOINTS.filter(w => w.km >= 390)
+    .map(w => { const p = mappaProject(w.lat, w.lon); return `${p.x.toFixed(1)},${p.y.toFixed(1)}`; }).join(' ');
+
+  let html = '';
+  // Background grid (subtle)
+  html += `<rect x="0" y="0" width="${MAPPA_VB.w}" height="${MAPPA_VB.h}" fill="#0a1220"/>`;
+  // River (thick halo + main)
+  html += `<polyline points="${pathPts}" fill="none" stroke="#1d3a5f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>`;
+  html += `<polyline points="${pathPts}" fill="none" stroke="#2E86AB" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>`;
+  // Montelera gold overlay
+  html += `<polyline points="${mtl}" fill="none" stroke="#ffd700" stroke-width="10" stroke-linecap="round" opacity="0.6"/>`;
+  // Final transfer dashed
+  html += `<polyline points="${tr}" fill="none" stroke="#00ff88" stroke-width="6" stroke-linecap="round" stroke-dasharray="8,5" opacity="0.65"/>`;
+
+  // Waypoints
+  WAYPOINTS.forEach((w, i) => {
+    const p = mappaProject(w.lat, w.lon);
+    const s = mappaSeverity(w);
+    html += `<g class="mappa-wpt" data-idx="${i}" style="cursor:pointer">`;
+    // Invisible larger hit target for finger tap
+    html += `<circle cx="${p.x}" cy="${p.y}" r="16" fill="transparent"/>`;
+    html += mappaShapeSvg(s.shape, p.x, p.y, s.r, s.color);
+    html += `</g>`;
+  });
+
+  // "You are here" marker (updated separately)
+  html += `<g id="mappa-me" style="display:none">
+    <circle class="mappa-me-pulse" cx="0" cy="0" r="6" fill="none" stroke="#00d4ff" stroke-width="2"/>
+    <circle cx="0" cy="0" r="5" fill="#00d4ff" stroke="white" stroke-width="1.5"/>
+  </g>`;
+
+  // Labels for CRITICAL waypoints only (5 of them) — to avoid clutter
+  [9, 67, 128, 295, 310].forEach(km => {
+    const w = WAYPOINTS.find(x => x.km === km);
+    if (!w) return;
+    const p = mappaProject(w.lat, w.lon);
+    html += `<text x="${p.x}" y="${p.y - 14}" fill="#ff6b6b" font-size="10" font-weight="700" text-anchor="middle" font-family="'Barlow Condensed',sans-serif">km ${km}</text>`;
+  });
+
+  // Start/end labels
+  const startP = mappaProject(WAYPOINTS[0].lat, WAYPOINTS[0].lon);
+  const endP = mappaProject(WAYPOINTS[WAYPOINTS.length-1].lat, WAYPOINTS[WAYPOINTS.length-1].lon);
+  html += `<text x="${startP.x}" y="${startP.y + 22}" fill="#00ff88" font-size="11" font-weight="900" text-anchor="middle" font-family="'Barlow Condensed',sans-serif">PAVIA</text>`;
+  html += `<text x="${endP.x - 12}" y="${endP.y + 4}" fill="#00ff88" font-size="11" font-weight="900" text-anchor="end" font-family="'Barlow Condensed',sans-serif">VENEZIA</text>`;
+
+  svg.innerHTML = html;
+
+  // Click handlers
+  svg.querySelectorAll('.mappa-wpt').forEach(g => {
+    g.addEventListener('click', () => {
+      const idx = parseInt(g.getAttribute('data-idx'));
+      mappaShowInfo(WAYPOINTS[idx]);
+    });
+  });
+
+  updateMappaPosition();
+}
+
+function mappaShowInfo(w) {
+  const info = document.getElementById('mappa-info');
+  info.classList.remove('empty');
+  info.innerHTML = `
+    <div id="mappa-info-km">KM ${w.km} · ${(TYPE_LABELS[w.type] || w.type).replace(/[⚠⭐🔒⛽➤🏁]/g, '').trim()}</div>
+    <div id="mappa-info-name">${w.name}</div>
+    <div id="mappa-info-alert">${w.alert}</div>
+  `;
+}
+
+function updateMappaPosition() {
+  const me = document.getElementById('mappa-me');
+  if (!me) return;
+  // Prefer real GPS lat/lon; fall back to km-based interpolation along waypoint polyline
+  let lat = state.lat, lon = state.lon;
+  if (lat == null || lon == null) {
+    // Interpolate from state.kmCovered along the waypoint polyline
+    const k = state.kmCovered;
+    if (k == null || k < 0) { me.style.display = 'none'; return; }
+    for (let i = 0; i < WAYPOINTS.length - 1; i++) {
+      const a = WAYPOINTS[i], b = WAYPOINTS[i+1];
+      if (k >= a.km && k <= b.km) {
+        const t = (k - a.km) / Math.max(1, b.km - a.km);
+        lat = a.lat + (b.lat - a.lat) * t;
+        lon = a.lon + (b.lon - a.lon) * t;
+        break;
+      }
+    }
+    if (lat == null) { me.style.display = 'none'; return; }
+  }
+  const p = mappaProject(lat, lon);
+  me.setAttribute('transform', `translate(${p.x}, ${p.y})`);
+  me.style.display = 'block';
+}
+
+function showMappa() {
+  buildMappa();
+  document.getElementById('mappa-panel').classList.add('open');
+}
+function hideMappa() {
+  document.getElementById('mappa-panel').classList.remove('open');
+}
 
 // Long press on next-block opens waypoint list
 let longPressTimer = null;
@@ -912,7 +1149,7 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   const swCode = `
-const CACHE = 'raid-pv-v2';
+const CACHE = 'raid-pv-v4';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap'
 ];
