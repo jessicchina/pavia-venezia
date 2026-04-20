@@ -386,7 +386,7 @@
   <div id="offline-bar">📵 OFFLINE — DATI GPS LOCALI</div>
 
   <!-- Demo bar -->
-  <div id="demo-bar">⚡ DEMO MODE — SIMULAZIONE PERCORSO</div>
+  <div id="demo-bar">⚡ MODALITÀ DEMO — SIMULAZIONE PERCORSO</div>
 
   <!-- Top bar -->
   <div id="topbar">
@@ -447,7 +447,7 @@
     <button class="btn" id="btn-secca" onclick="toggleSecca()">🚨 SECCA<br>MANUALE</button>
     <button class="btn" id="btn-mappa" onclick="showMappa()">🗺 MAPPA<br>PO</button>
     <button class="btn" id="btn-panel" onclick="showSegnaletica()">📋 SEGNI<br>ACQUA</button>
-    <button class="btn" id="btn-demo" onclick="toggleDemo()">▶ DEMO<br>MODE</button>
+    <button class="btn" id="btn-demo" onclick="toggleDemo()">▶ PROVA<br>DEMO</button>
     <button id="btn-sos" onclick="callSOS()">🆘 SOS</button>
   </div>
 
@@ -1068,12 +1068,35 @@ function speak(text) {
   if (!state.voiceSpeaking) processVoiceQueue();
 }
 
+// Cache the Italian voice once so every utterance uses it. Without this,
+// Safari/iOS falls back to the system default voice (often English) and
+// pronounces Italian text with English phonetics — "attenzione" → "atten-ZEE-oh-knee".
+let _italianVoice = null;
+function getItalianVoice() {
+  if (_italianVoice) return _italianVoice;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices || voices.length === 0) return null;
+  // Preference order: Italian regional > any Italian > null
+  _italianVoice =
+    voices.find(v => v.lang === 'it-IT') ||
+    voices.find(v => v.lang && v.lang.toLowerCase().startsWith('it')) ||
+    null;
+  return _italianVoice;
+}
+// Voices load asynchronously on some browsers. Listen for the voiceschanged event.
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = () => { _italianVoice = null; getItalianVoice(); };
+  getItalianVoice();
+}
+
 function processVoiceQueue() {
   if (state.voiceQueue.length === 0) { state.voiceSpeaking = false; return; }
   state.voiceSpeaking = true;
   const text = state.voiceQueue.shift();
   const utt = new SpeechSynthesisUtterance(text);
   utt.lang = 'it-IT';
+  const voice = getItalianVoice();
+  if (voice) utt.voice = voice;
   utt.rate = 0.95;
   utt.pitch = 1.0;
   utt.volume = 1.0;
@@ -1310,14 +1333,14 @@ function startDemo() {
   state.lastAlertKm = {};
   state.maxSpeed = 0;
   document.getElementById('demo-bar').style.display = 'block';
-  document.getElementById('btn-demo').textContent = '⏹ STOP\nDEMO';
+  document.getElementById('btn-demo').textContent = '⏹ FERMA\nDEMO';
   document.getElementById('gps-status').textContent = '● DEMO';
   document.getElementById('gps-status').className = 'gps-weak';
 
   // Prime iOS Safari speech synthesis inside this user-gesture handler.
   // Without this, subsequent speak() calls from the setInterval below are
   // silently blocked by iOS because they're not tied to a user interaction.
-  speak("Demo mode avviato");
+  speak("Modalità demo avviata");
 
   // Demo speed: 0.25 km per 500ms tick = 500 m/s simulated. Slow enough
   // that voice alerts (2-3 seconds each) can complete before the next one,
@@ -1335,7 +1358,7 @@ function stopDemo() {
   state.demoMode = false;
   clearInterval(state.demoInterval);
   document.getElementById('demo-bar').style.display = 'none';
-  document.getElementById('btn-demo').innerHTML = '▶ DEMO<br>MODE';
+  document.getElementById('btn-demo').innerHTML = '▶ PROVA<br>DEMO';
   updateDisplay(0, 0);
   state.nextWptIdx = 1;
   state.lastAlertKm = {};
@@ -1477,7 +1500,7 @@ function buildMappa() {
       <div class="pp-km">KM ${w.km} · ${typeLabel}</div>
       <div class="pp-name">${w.name}</div>
       <div class="pp-alert">${w.alert}</div>
-      <a href="${sporttraxxUrl}" target="_blank" rel="noopener" style="display:block;margin-top:8px;padding:5px 8px;background:#2E86AB;color:white;text-decoration:none;font-weight:800;font-size:10px;letter-spacing:1px;border-radius:4px;text-align:center;">🌐 VEDI LIVE SU SPORTTRAXX</a>
+      <a href="${sporttraxxUrl}" target="_blank" rel="noopener" style="display:block;margin-top:8px;padding:5px 8px;background:#2E86AB;color:white;text-decoration:none;font-weight:800;font-size:10px;letter-spacing:1px;border-radius:4px;text-align:center;">🌐 MONITORAGGIO IN DIRETTA — SPORTTRAXX</a>
     `;
     marker.bindPopup(popupHtml, { maxWidth: 260, autoPanPadding: [20, 60] });
     marker.on('click', () => mappaShowInfo(w));
@@ -1722,7 +1745,7 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   const swCode = `
-const CACHE = 'raid-pv-v18';
+const CACHE = 'raid-pv-v19';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap'
 ];
