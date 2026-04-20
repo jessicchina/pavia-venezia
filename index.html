@@ -218,47 +218,65 @@
   .wpt-name { flex: 1; font-weight: 700; }
   .wpt-type-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
-  /* ─── MAPPA PO PANEL ─── */
+  /* ─── MAPPA PO PANEL (stile ufficiale) ─── */
   #mappa-panel {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background: var(--bg); z-index: 101;
+    background: #0f1017; z-index: 101;
     display: none; flex-direction: column;
-    padding: 12px 10px 10px;
+    padding: 10px 8px 8px;
   }
   #mappa-panel.open { display: flex; }
-  #mappa-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0; }
-  #mappa-title { font-size: 15px; font-weight: 900; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; }
-  #mappa-close { font-size: 28px; color: var(--muted); cursor: pointer; background: none; border: none; font-family: 'Barlow Condensed'; padding: 0 8px; line-height: 1; }
+  #mappa-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-shrink: 0; }
+  #mappa-title { font-size: 14px; font-weight: 900; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; }
+  #mappa-close { font-size: 26px; color: var(--muted); cursor: pointer; background: none; border: none; font-family: 'Barlow Condensed'; padding: 0 8px; line-height: 1; }
   #mappa-svg-wrap {
     flex: 1; position: relative; overflow: hidden;
-    background: #0a1220; border: 1px solid rgba(0,212,255,0.15); border-radius: 8px;
+    /* Sepia/aerial background gradient like the official map */
+    background:
+      radial-gradient(ellipse at 30% 40%, rgba(212,180,138,0.12), transparent 50%),
+      radial-gradient(ellipse at 70% 60%, rgba(161,139,109,0.12), transparent 50%),
+      linear-gradient(135deg, #2a261c 0%, #1e1a13 50%, #14120d 100%);
+    border: 1px solid rgba(212,180,138,0.25); border-radius: 8px;
     min-height: 0;
+    touch-action: pan-x pan-y;
   }
-  #mappa-svg { width: 100%; height: 100%; display: block; }
+  #mappa-svg { width: 100%; height: 100%; display: block; touch-action: none; }
   #mappa-info {
-    flex-shrink: 0; padding: 10px; margin-top: 8px;
+    flex-shrink: 0; padding: 9px; margin-top: 6px;
     background: var(--bg3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
-    min-height: 64px; font-size: 13px; line-height: 1.35;
+    min-height: 60px; font-size: 13px; line-height: 1.35;
   }
-  #mappa-info.empty { color: var(--muted); text-align: center; font-style: italic; }
+  #mappa-info.empty { color: var(--muted); text-align: center; font-style: italic; font-size: 12px; }
   #mappa-info-km { font-size: 11px; font-weight: 800; color: var(--muted); letter-spacing: 1px; }
   #mappa-info-name { font-size: 15px; font-weight: 900; color: var(--white); margin: 3px 0; }
   #mappa-info-alert { font-size: 12px; color: var(--cyan); font-weight: 600; }
   #mappa-legend {
-    flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 8px 14px;
-    margin-top: 6px; padding: 6px 4px; font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px;
+    flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px 12px;
+    margin-top: 4px; padding: 3px 4px; font-size: 9px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px;
   }
   .mappa-leg-item { display: flex; align-items: center; gap: 4px; }
-  .mappa-leg-dot { width: 9px; height: 9px; border-radius: 50%; }
-  .mappa-leg-sq { width: 9px; height: 9px; border-radius: 2px; }
-  .mappa-me-pulse {
-    animation: mePulse 1.2s ease-out infinite;
-    transform-origin: center;
-  }
-  @keyframes mePulse {
-    0% { opacity: 0.8; r: 6; }
-    100% { opacity: 0; r: 18; }
-  }
+  .mappa-leg-dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid white; }
+  /* SVG element styles */
+  .po-river-real { stroke: #4a9dd4; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0.95; }
+  .po-river-halo { stroke: #1a3a55; stroke-width: 3.5; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0.7; }
+  .po-ticino-approx { stroke: #4a9dd4; stroke-width: 1.5; fill: none; stroke-dasharray: 3,2; opacity: 0.7; }
+  .po-canal-final { stroke: #3d8c4e; stroke-width: 1.5; fill: none; stroke-dasharray: 4,3; opacity: 0.8; }
+  .po-montelera { stroke: #d4a017; stroke-width: 3; fill: none; stroke-linecap: round; opacity: 0.55; }
+  .wpt-dot-stem { stroke: rgba(255,255,255,0.25); stroke-width: 0.5; fill: none; }
+  .wpt-dot-normal { fill: #d62828; stroke: white; stroke-width: 1; }
+  .wpt-dot-critical { fill: #ff3b3b; stroke: white; stroke-width: 1.5; filter: drop-shadow(0 0 3px rgba(255,59,59,0.9)); }
+  .wpt-dot-confluence { fill: #e8a838; stroke: white; stroke-width: 1; }
+  .wpt-dot-stop { fill: #9b59b6; stroke: white; stroke-width: 1; }
+  .wpt-dot-cronometro { fill: #d4a017; stroke: white; stroke-width: 1; }
+  .wpt-label { fill: #e8dcc0; font-size: 8px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; }
+  .wpt-label-critical { fill: #ff9999; font-size: 9px; font-weight: 900; }
+  .wpt-label-km { fill: #a89575; font-size: 7px; font-weight: 700; letter-spacing: 0.5px; }
+  .wpt-icon-bg { fill: white; stroke: #333; stroke-width: 0.4; }
+  .section-label { fill: #d4a017; font-size: 11px; font-weight: 900; letter-spacing: 2px; font-family: 'Barlow Condensed', sans-serif; }
+  .section-label-red { fill: #d62828; font-size: 11px; font-weight: 900; letter-spacing: 2px; font-family: 'Barlow Condensed', sans-serif; }
+  .me-pulse-outer { fill: rgba(0,212,255,0.25); animation: mePulse3 1.4s ease-out infinite; transform-origin: center; }
+  .me-dot-main { fill: #00d4ff; stroke: white; stroke-width: 1.2; }
+  @keyframes mePulse3 { 0% { r: 5; opacity: 0.7; } 100% { r: 18; opacity: 0; } }
 
   /* ─── GPS SIGNAL INDICATOR ─── */
   .gps-ok { color: var(--green); }
@@ -400,7 +418,7 @@
     <div id="wptlist-scroll"></div>
   </div>
 
-  <!-- Mappa Po panel -->
+  <!-- Mappa Po panel (stile ufficiale) -->
   <div id="mappa-panel">
     <div id="mappa-header">
       <div id="mappa-title">🗺 Mappa Po · 413 km</div>
@@ -409,20 +427,47 @@
     <div id="mappa-svg-wrap">
       <svg id="mappa-svg" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
-    <div id="mappa-info" class="empty">Tocca un waypoint per vederne i dettagli</div>
+    <div id="mappa-info" class="empty">Tocca un punto per vederne i dettagli</div>
     <div id="mappa-legend">
       <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#ff3b3b"></span>CRITICO</div>
-      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#ff6b35"></span>ALTO/ATTENZIONE</div>
-      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#ffb020"></span>CONFLUENZA</div>
-      <div class="mappa-leg-item"><span class="mappa-leg-sq" style="background:#ff6b35"></span>FERMATA</div>
-      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#ffd700"></span>CRONO/SPECIALE</div>
-      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#00d4ff;box-shadow:0 0 6px #00d4ff"></span>QUI (GPS)</div>
+      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#d62828"></span>PUNTO UFFICIALE</div>
+      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#e8a838"></span>CONFLUENZA</div>
+      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#9b59b6"></span>FERMATA</div>
+      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#d4a017"></span>CRONO</div>
+      <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#00d4ff"></span>QUI (GPS)</div>
     </div>
   </div>
 
 </div>
 
 <script>
+// ═══════════════════════════════════════════════
+// GEOMETRY — real Po river from OpenStreetMap
+// (© OpenStreetMap contributors, simplified Douglas-Peucker)
+// ═══════════════════════════════════════════════
+const PO_RIVER = [
+  [[45.0615, 12.2296], [45.0581, 12.2424], [45.0633, 12.2493], [45.0634, 12.2619], [45.0554, 12.2724], [45.0559, 12.2894], [45.0484, 12.3089], [45.0449, 12.3435], [45.0555, 12.3763], [45.0642, 12.3568], [45.0765, 12.3635]],
+  [[45.0325, 10.134], [45.0329, 10.1577], [45.0437, 10.175], [45.023, 10.2158], [45.0282, 10.2453], [45.024, 10.2505], [45.0071, 10.2534], [45.0055, 10.2863], [44.9871, 10.3017], [44.9822, 10.334], [44.9625, 10.3594], [44.9663, 10.3712], [44.9864, 10.389], [44.9892, 10.4011]],
+  [[45.0936, 9.4555], [45.1013, 9.5053], [45.0817, 9.5263], [45.0795, 9.5371], [45.0924, 9.5536], [45.1163, 9.5337], [45.1326, 9.5343], [45.1372, 9.5397], [45.1311, 9.5528], [45.108, 9.5686], [45.0998, 9.5851], [45.1083, 9.6134], [45.1245, 9.6178], [45.1322, 9.628], [45.1265, 9.6378], [45.1154, 9.6433], [45.0852, 9.6323], [45.0796, 9.6433], [45.0789, 9.6758], [45.0595, 9.7062]],
+  [[45.0932, 9.9052], [45.0958, 9.9153]],
+  [[44.8035, 11.9716], [44.8151, 11.9999], [44.8107, 12.0126], [44.8153, 12.031], [44.8272, 12.0368], [44.8354, 12.0525], [44.8309, 12.1049], [44.8146, 12.1177]],
+  [[45.0559, 11.1353], [45.0471, 11.1467], [45.0448, 11.1629], [45.0585, 11.2002], [45.0581, 11.2109], [45.043, 11.2362], [45.0439, 11.2481], [45.0562, 11.2648], [45.0542, 11.2705], [45.047, 11.2713], [45.0226, 11.2617], [45.0114, 11.3023]],
+  [[45.0684, 10.9743], [45.0684, 10.9948], [45.0549, 11.0174], [45.0427, 11.0694], [45.0456, 11.0935], [45.0568, 11.1151]],
+  [[45.052, 10.7046], [45.0512, 10.7183], [45.0393, 10.7371], [45.0466, 10.7651], [45.0398, 10.7896], [45.0409, 10.8344], [45.0629, 10.8701], [45.05, 10.8888], [45.0485, 10.8999], [45.0541, 10.907], [45.0787, 10.911], [45.0786, 10.9227], [45.065, 10.9524], [45.0684, 10.9743]],
+  [[44.8917, 9.444], [44.9044, 9.46], [44.9116, 9.4841], [44.9251, 9.4955], [44.9324, 9.5171], [44.9526, 9.5333], [44.9714, 9.5345], [44.9868, 9.5285], [44.994, 9.5195], [45.0058, 9.5202], [45.0164, 9.5375], [45.035, 9.5422], [45.0403, 9.5349]],
+  [[44.8146, 12.1177], [44.8065, 12.1093], [44.7979, 12.1178], [44.7835, 12.1227], [44.7831, 12.1378], [44.7921, 12.1447], [44.7961, 12.1408]],
+  [[44.7961, 12.1408], [44.7981, 12.154], [44.8097, 12.148]],
+  [[45.0367, 12.1913], [45.0296, 12.1894]],
+  [[45.0554, 12.215], [45.0615, 12.2296]],
+  [[45.0295, 10.0517], [45.0336, 10.0578], [45.0306, 10.0832], [45.0125, 10.1113], [45.0325, 10.134]],
+  [[44.9892, 10.4011], [44.9864, 10.4103], [44.9689, 10.4271], [44.9386, 10.431], [44.935, 10.4855], [44.911, 10.5153], [44.9128, 10.537], [44.9036, 10.577], [44.9061, 10.5907], [44.9213, 10.6084], [44.9282, 10.6318], [44.9478, 10.6415], [44.9612, 10.6666], [44.983, 10.6738], [44.9994, 10.7004], [45.0075, 10.6986], [45.0172, 10.6766], [45.0327, 10.6759], [45.0428, 10.6622], [45.052, 10.7046]],
+  [[45.0114, 11.3023], [45.0078, 11.3147], [44.991, 11.3326], [44.9687, 11.3972], [44.9649, 11.4269], [44.9528, 11.43], [44.9308, 11.4209], [44.9263, 11.4253], [44.9362, 11.467], [44.9363, 11.5371], [44.9218, 11.5577], [44.9115, 11.5872], [44.8982, 11.588], [44.8882, 11.597], [44.8883, 11.6242], [44.9137, 11.6699], [44.9288, 11.7393], [44.9337, 11.745], [44.9493, 11.7401], [44.9578, 11.7443], [44.9629, 11.783], [44.9772, 11.8049], [44.9721, 11.8427], [44.9771, 11.8973], [44.9749, 11.9271], [44.9869, 11.9657], [44.9758, 12.0163], [44.976, 12.0492]],
+  [[44.9629, 12.5032], [44.9616, 12.4584], [44.9535, 12.432], [44.9604, 12.404], [44.9536, 12.301]],
+  [[45.0403, 9.5349], [45.0464, 9.5303], [45.0583, 9.5348], [45.0795, 9.5371]],
+  [[45.0958, 9.9153], [45.1202, 9.9636], [45.1329, 9.9742], [45.1319, 9.9873], [45.124, 10.0012], [45.1091, 10.0071], [45.0996, 10.0295], [45.0804, 10.0328], [45.0676, 10.0466], [45.0295, 10.0517]],
+  [[45.0595, 9.7062], [45.0586, 9.7213], [45.0699, 9.7393], [45.0934, 9.7595], [45.1065, 9.7545], [45.1122, 9.7591], [45.078, 9.7952], [45.0776, 9.8157], [45.0608, 9.8325], [45.067, 9.8364], [45.0897, 9.8315], [45.0983, 9.8402], [45.0948, 9.8615], [45.0761, 9.88], [45.078, 9.8944], [45.0883, 9.9025], [45.092, 9.9013]],
+];
+
 // ═══════════════════════════════════════════════
 // WAYPOINTS DATA
 // ═══════════════════════════════════════════════
@@ -824,116 +869,192 @@ function buildWptList() {
 function hideWptList() { document.getElementById('wptlist-panel').classList.remove('open'); }
 
 // ═══════════════════════════════════════════════
-// MAPPA PO — SVG map with waypoints + "you are here"
+// MAPPA PO — stile ufficiale raidpaviavenezia.it
+// Real Po river geometry + our safety overlay
 // ═══════════════════════════════════════════════
-const MAPPA_VB = { w: 1000, h: 260, padX: 20, padY: 30 };
+const MAPPA_VB = { w: 1200, h: 300, padX: 30, padY: 45 };
+
+// bbox covers all waypoints + Po river geometry + buffer for labels
+function _mappaBBox() {
+  let minLat = 999, maxLat = -999, minLon = 999, maxLon = -999;
+  for (const w of WAYPOINTS) {
+    if (w.lat < minLat) minLat = w.lat;
+    if (w.lat > maxLat) maxLat = w.lat;
+    if (w.lon < minLon) minLon = w.lon;
+    if (w.lon > maxLon) maxLon = w.lon;
+  }
+  for (const seg of PO_RIVER) for (const p of seg) {
+    if (p[0] < minLat) minLat = p[0];
+    if (p[0] > maxLat) maxLat = p[0];
+    if (p[1] < minLon) minLon = p[1];
+    if (p[1] > maxLon) maxLon = p[1];
+  }
+  return { minLat, maxLat, minLon, maxLon };
+}
+const _MBB = _mappaBBox();
 
 function mappaProject(lat, lon) {
-  // Compute bbox of all waypoints
-  const lats = WAYPOINTS.map(w => w.lat);
-  const lons = WAYPOINTS.map(w => w.lon);
-  const minLat = Math.min(...lats), maxLat = Math.max(...lats);
-  const minLon = Math.min(...lons), maxLon = Math.max(...lons);
-  const dLat = maxLat - minLat || 1e-6;
-  const dLon = maxLon - minLon || 1e-6;
-  const x = MAPPA_VB.padX + ((lon - minLon) / dLon) * (MAPPA_VB.w - 2 * MAPPA_VB.padX);
-  const y = MAPPA_VB.padY + ((maxLat - lat) / dLat) * (MAPPA_VB.h - 2 * MAPPA_VB.padY);
+  const dLat = _MBB.maxLat - _MBB.minLat || 1e-6;
+  const dLon = _MBB.maxLon - _MBB.minLon || 1e-6;
+  const x = MAPPA_VB.padX + ((lon - _MBB.minLon) / dLon) * (MAPPA_VB.w - 2 * MAPPA_VB.padX);
+  const y = MAPPA_VB.padY + ((_MBB.maxLat - lat) / dLat) * (MAPPA_VB.h - 2 * MAPPA_VB.padY);
   return { x, y };
 }
 
-function mappaSeverity(w) {
-  // Returns: color, size, shape for each waypoint
+// Severity → styling class (matches CSS .wpt-dot-*)
+function mappaWptClass(w) {
   const CRIT = [9, 67, 128, 295, 310];
-  if (CRIT.includes(w.km)) return { color: '#ff3b3b', r: 9, shape: 'circle' };
-  if (w.type === 'stop' || w.type === 'lock' || w.type === 'fuel') return { color: '#ff6b35', r: 8, shape: 'square' };
-  if (w.type === 'confluence') return { color: '#ffb020', r: 7, shape: 'triangle' };
-  if (w.type === 'curve_danger' || w.type === 'warning' || w.type === 'secca') return { color: '#ff6b35', r: 6, shape: 'circle' };
-  if (w.type === 'special' || w.type === 'start' || w.type === 'timed_start' || w.type === 'timed_end' || w.type === 'finish') return { color: '#ffd700', r: 7, shape: 'star' };
-  return { color: '#00d4ff', r: 5, shape: 'circle' };
+  if (CRIT.includes(w.km)) return 'wpt-dot-critical';
+  if (w.type === 'confluence') return 'wpt-dot-confluence';
+  if (w.type === 'lock' || w.type === 'fuel') return 'wpt-dot-stop';
+  if (['timed_start','timed_end','special','start','finish'].includes(w.type)) return 'wpt-dot-cronometro';
+  return 'wpt-dot-normal';
 }
 
-function mappaShapeSvg(shape, cx, cy, r, color) {
-  if (shape === 'square') return `<rect x="${cx-r}" y="${cy-r}" width="${r*2}" height="${r*2}" fill="${color}" stroke="white" stroke-width="1.2"/>`;
-  if (shape === 'triangle') {
-    const p = `${cx},${cy-r*1.15} ${cx-r},${cy+r*0.7} ${cx+r},${cy+r*0.7}`;
-    return `<polygon points="${p}" fill="${color}" stroke="white" stroke-width="1.2"/>`;
+// Icon SVG by waypoint type (stopwatch / fuel / trophy / lock)
+function mappaIconFor(w) {
+  // returns inline SVG path fragment, sized for a ~12px box centered at 0,0
+  if (w.type === 'fuel') {
+    // Fuel pump silhouette
+    return '<g><circle r="7" class="wpt-icon-bg"/><path d="M-3,-4 L-3,3 L-1,3 L-1,-2 L1,-2 L1,3 L3,3 L3,-4 Z" fill="#222" stroke="none"/></g>';
   }
-  if (shape === 'star') {
-    let pts = [];
-    for (let i = 0; i < 10; i++) {
-      const a = -Math.PI/2 + i * Math.PI/5;
-      const rr = (i % 2 === 0) ? r*1.2 : r*0.55;
-      pts.push(`${cx + rr*Math.cos(a)},${cy + rr*Math.sin(a)}`);
-    }
-    return `<polygon points="${pts.join(' ')}" fill="${color}" stroke="white" stroke-width="1"/>`;
+  if (w.type === 'lock') {
+    // Lock/conca: padlock
+    return '<g><circle r="7" class="wpt-icon-bg"/><rect x="-2.5" y="-1" width="5" height="4" fill="#222"/><path d="M-1.8,-1 L-1.8,-3 A1.8,1.8 0 0 1 1.8,-3 L1.8,-1" stroke="#222" stroke-width="0.9" fill="none"/></g>';
   }
-  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" stroke="white" stroke-width="1.2"/>`;
+  if (w.type === 'special' && w.km === 225) {
+    // Trophy for Montelera start
+    return '<g><circle r="7" class="wpt-icon-bg"/><path d="M-2.5,-3 L2.5,-3 L2,1 L-2,1 Z M-1,1 L1,1 L1,3 L-1,3 Z" fill="#d4a017" stroke="#222" stroke-width="0.3"/></g>';
+  }
+  if (w.type === 'timed_start' || w.type === 'timed_end') {
+    // Stopwatch
+    return '<g><circle r="7" class="wpt-icon-bg"/><circle r="3.5" fill="none" stroke="#222" stroke-width="0.8"/><line x1="0" y1="0" x2="0" y2="-2.5" stroke="#222" stroke-width="0.8"/><line x1="0" y1="-3.5" x2="0" y2="-4.5" stroke="#222" stroke-width="1.2"/></g>';
+  }
+  return '';
 }
 
 function buildMappa() {
   const svg = document.getElementById('mappa-svg');
   svg.setAttribute('viewBox', `0 0 ${MAPPA_VB.w} ${MAPPA_VB.h}`);
 
-  // River polyline through all waypoints
-  const pathPts = WAYPOINTS.map(w => { const p = mappaProject(w.lat, w.lon); return `${p.x.toFixed(1)},${p.y.toFixed(1)}`; }).join(' ');
+  let html = '';
 
-  // Montelera highlight (gold over-line)
+  // ─── 1. Real Po river geometry from OSM (multi-segment polylines) ───
+  for (const seg of PO_RIVER) {
+    const pts = seg.map(p => { const pr = mappaProject(p[0], p[1]); return `${pr.x.toFixed(1)},${pr.y.toFixed(1)}`; }).join(' ');
+    html += `<polyline class="po-river-halo" points="${pts}"/>`;
+  }
+  for (const seg of PO_RIVER) {
+    const pts = seg.map(p => { const pr = mappaProject(p[0], p[1]); return `${pr.x.toFixed(1)},${pr.y.toFixed(1)}`; }).join(' ');
+    html += `<polyline class="po-river-real" points="${pts}"/>`;
+  }
+
+  // ─── 2. Waypoint polyline (fills any OSM gaps, subtle) ───
+  const wptPath = WAYPOINTS.map(w => { const p = mappaProject(w.lat, w.lon); return `${p.x.toFixed(1)},${p.y.toFixed(1)}`; }).join(' ');
+  html += `<polyline points="${wptPath}" stroke="#4a9dd4" stroke-width="0.8" fill="none" opacity="0.35" stroke-dasharray="2,1.5"/>`;
+
+  // ─── 3. Ticino segment (km 0 → km 9) as dashed ───
+  const w0 = mappaProject(WAYPOINTS[0].lat, WAYPOINTS[0].lon);
+  const wBecca = mappaProject(WAYPOINTS[1].lat, WAYPOINTS[1].lon);
+  html += `<line class="po-ticino-approx" x1="${w0.x}" y1="${w0.y}" x2="${wBecca.x}" y2="${wBecca.y}"/>`;
+
+  // ─── 4. Montelera overlay (km 225 → km 280) gold ───
   const mtl = WAYPOINTS.filter(w => w.km >= 225 && w.km <= 280)
     .map(w => { const p = mappaProject(w.lat, w.lon); return `${p.x.toFixed(1)},${p.y.toFixed(1)}`; }).join(' ');
-  // Final transfer (dashed green)
+  html += `<polyline class="po-montelera" points="${mtl}"/>`;
+
+  // ─── 5. Final transfer (km 390+) green dashed ───
   const tr = WAYPOINTS.filter(w => w.km >= 390)
     .map(w => { const p = mappaProject(w.lat, w.lon); return `${p.x.toFixed(1)},${p.y.toFixed(1)}`; }).join(' ');
+  html += `<polyline class="po-canal-final" points="${tr}"/>`;
 
-  let html = '';
-  // Background grid (subtle)
-  html += `<rect x="0" y="0" width="${MAPPA_VB.w}" height="${MAPPA_VB.h}" fill="#0a1220"/>`;
-  // River (thick halo + main)
-  html += `<polyline points="${pathPts}" fill="none" stroke="#1d3a5f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>`;
-  html += `<polyline points="${pathPts}" fill="none" stroke="#2E86AB" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>`;
-  // Montelera gold overlay
-  html += `<polyline points="${mtl}" fill="none" stroke="#ffd700" stroke-width="10" stroke-linecap="round" opacity="0.6"/>`;
-  // Final transfer dashed
-  html += `<polyline points="${tr}" fill="none" stroke="#00ff88" stroke-width="6" stroke-linecap="round" stroke-dasharray="8,5" opacity="0.65"/>`;
-
-  // Waypoints
-  WAYPOINTS.forEach((w, i) => {
-    const p = mappaProject(w.lat, w.lon);
-    const s = mappaSeverity(w);
-    html += `<g class="mappa-wpt" data-idx="${i}" style="cursor:pointer">`;
-    // Invisible larger hit target for finger tap
-    html += `<circle cx="${p.x}" cy="${p.y}" r="16" fill="transparent"/>`;
-    html += mappaShapeSvg(s.shape, p.x, p.y, s.r, s.color);
-    html += `</g>`;
-  });
-
-  // "You are here" marker (updated separately)
-  html += `<g id="mappa-me" style="display:none">
-    <circle class="mappa-me-pulse" cx="0" cy="0" r="6" fill="none" stroke="#00d4ff" stroke-width="2"/>
-    <circle cx="0" cy="0" r="5" fill="#00d4ff" stroke="white" stroke-width="1.5"/>
-  </g>`;
-
-  // Labels for CRITICAL waypoints only (5 of them) — to avoid clutter
-  [9, 67, 128, 295, 310].forEach(km => {
-    const w = WAYPOINTS.find(x => x.km === km);
-    if (!w) return;
-    const p = mappaProject(w.lat, w.lon);
-    html += `<text x="${p.x}" y="${p.y - 14}" fill="#ff6b6b" font-size="10" font-weight="700" text-anchor="middle" font-family="'Barlow Condensed',sans-serif">km ${km}</text>`;
-  });
-
-  // Start/end labels
+  // ─── 6. PARTENZA / ARRIVO section labels (stile ufficiale) ───
   const startP = mappaProject(WAYPOINTS[0].lat, WAYPOINTS[0].lon);
   const endP = mappaProject(WAYPOINTS[WAYPOINTS.length-1].lat, WAYPOINTS[WAYPOINTS.length-1].lon);
-  html += `<text x="${startP.x}" y="${startP.y + 22}" fill="#00ff88" font-size="11" font-weight="900" text-anchor="middle" font-family="'Barlow Condensed',sans-serif">PAVIA</text>`;
-  html += `<text x="${endP.x - 12}" y="${endP.y + 4}" fill="#00ff88" font-size="11" font-weight="900" text-anchor="end" font-family="'Barlow Condensed',sans-serif">VENEZIA</text>`;
+  html += `<text x="${startP.x - 2}" y="${startP.y - 26}" class="section-label-red" text-anchor="start">PARTENZA</text>`;
+  html += `<text x="${startP.x - 2}" y="${startP.y - 14}" fill="#e8dcc0" font-size="7" font-weight="700" text-anchor="start" font-family="'Barlow Condensed'">RACE START</text>`;
+  html += `<text x="${endP.x + 4}" y="${endP.y - 8}" class="section-label-red" text-anchor="start">ARRIVO</text>`;
+  html += `<text x="${endP.x + 4}" y="${endP.y + 3}" fill="#e8dcc0" font-size="7" font-weight="700" text-anchor="start" font-family="'Barlow Condensed'">RACE ARRIVAL</text>`;
+
+  // ─── 7. Waypoints with stems + labels (alternating up/down) ───
+  // Assign label position per waypoint to minimize overlap
+  const labelPositions = {};
+  WAYPOINTS.forEach((w, i) => {
+    const isAbove = (i % 2 === 0);
+    labelPositions[w.km] = isAbove ? -1 : 1;
+  });
+  // Override some for clarity
+  [9, 67, 128, 295, 310].forEach(km => { labelPositions[km] = -1; }); // critical always above
+  [95, 146].forEach(km => { labelPositions[km] = 1; }); // stops below
+
+  WAYPOINTS.forEach((w, i) => {
+    const p = mappaProject(w.lat, w.lon);
+    const cls = mappaWptClass(w);
+    const isCritical = cls === 'wpt-dot-critical';
+    const isStop = cls === 'wpt-dot-stop';
+    const isConf = cls === 'wpt-dot-confluence';
+    const r = isCritical ? 3.8 : (isStop ? 3.4 : (isConf ? 2.8 : 2.8));
+    const showIcon = ['fuel','lock','timed_start','timed_end'].includes(w.type) || (w.type === 'special' && w.km === 225);
+    const showLabel = isCritical || isStop || ['start','finish','fuel','lock'].includes(w.type) || (w.type === 'special' && (w.km === 225 || w.km === 280)) || ['timed_start','timed_end'].includes(w.type) && w.km !== 0;
+
+    html += `<g class="mappa-wpt" data-idx="${i}" style="cursor:pointer" pointer-events="all">`;
+    // Large transparent hit target (iOS requirement: fill-opacity > 0)
+    html += `<circle cx="${p.x}" cy="${p.y}" r="14" fill="#000" fill-opacity="0.01" pointer-events="all"/>`;
+    // Stem (thin vertical line from river to label) — only if label shown
+    if (showLabel) {
+      const stemLen = 16;
+      const dy = labelPositions[w.km];
+      const stemY = p.y + dy * stemLen;
+      html += `<line class="wpt-dot-stem" x1="${p.x}" y1="${p.y}" x2="${p.x}" y2="${stemY}"/>`;
+    }
+    // Dot
+    html += `<circle cx="${p.x}" cy="${p.y}" r="${r}" class="${cls}"/>`;
+    // Icon overlay
+    if (showIcon) {
+      html += `<g transform="translate(${p.x}, ${p.y + (labelPositions[w.km]||-1) * 10})">${mappaIconFor(w)}</g>`;
+    }
+    html += `</g>`;
+
+    // Label text (drawn outside the interactive group so stems don't overlap)
+    if (showLabel) {
+      const dy = labelPositions[w.km] || -1;
+      const stemLen = 16;
+      const hasIcon = showIcon;
+      const labelY = p.y + dy * (stemLen + 5 + (hasIcon ? 9 : 0));
+      const labelClass = isCritical ? 'wpt-label-critical' : 'wpt-label';
+      // Name on one line, km on another
+      const nameShort = w.name.split('—')[0].replace(/Confluenza /, 'Conf. ').trim();
+      const kmTxt = `km ${w.km}`;
+      if (dy < 0) {
+        // Above: km above, name above that
+        html += `<text x="${p.x}" y="${labelY}" class="wpt-label-km" text-anchor="middle">${kmTxt}</text>`;
+        html += `<text x="${p.x}" y="${labelY - 8}" class="${labelClass}" text-anchor="middle">${nameShort}</text>`;
+      } else {
+        // Below: name below, km below that
+        html += `<text x="${p.x}" y="${labelY}" class="${labelClass}" text-anchor="middle">${nameShort}</text>`;
+        html += `<text x="${p.x}" y="${labelY + 8}" class="wpt-label-km" text-anchor="middle">${kmTxt}</text>`;
+      }
+    }
+  });
+
+  // ─── 8. "You are here" marker ───
+  html += `<g id="mappa-me" style="display:none">
+    <circle class="me-pulse-outer" cx="0" cy="0"/>
+    <circle class="me-dot-main" cx="0" cy="0" r="4.5"/>
+  </g>`;
 
   svg.innerHTML = html;
 
-  // Click handlers
+  // Click handlers — both click AND touchend for iOS Safari robustness
   svg.querySelectorAll('.mappa-wpt').forEach(g => {
-    g.addEventListener('click', () => {
+    const handler = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
       const idx = parseInt(g.getAttribute('data-idx'));
       mappaShowInfo(WAYPOINTS[idx]);
-    });
+    };
+    g.addEventListener('click', handler);
+    g.addEventListener('touchend', handler, { passive: false });
   });
 
   updateMappaPosition();
@@ -1149,7 +1270,7 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   const swCode = `
-const CACHE = 'raid-pv-v4';
+const CACHE = 'raid-pv-v6';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap'
 ];
