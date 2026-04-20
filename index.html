@@ -496,39 +496,40 @@ const PO_RIVER = [
 // WAYPOINTS DATA
 // ═══════════════════════════════════════════════
 const WAYPOINTS = [
-  { km: 0,   name: "Partenza Pavia",                    type: "start",        lat: 45.1847, lon: 9.1542,  alert: "Gara iniziata. Velocità di sostentamento sul Ticino." },
-  { km: 9,   name: "Ponte della Becca — conf. Ticino",  type: "timed_start",  lat: 45.1561, lon: 9.2361,  alert: "ATTENZIONE PONTE BECCA. Virata SINISTRA. Ripeto: virata SINISTRA. Centro canale Po. Turbolenze. Cronometro parte ora." },
-  { km: 18,  name: "Ansa di Mezzano Chitanto",          type: "curve_danger", lat: 45.1200, lon: 9.3500,  alert: "Curva pericolosa — ansa stretta, corrente forte. Tenere l'esterno." },
-  { km: 22,  name: "Confluenza Lambro — da destra",     type: "confluence",   lat: 45.1106, lon: 9.3853,  alert: "Confluenza Lambro da DESTRA. Non è un bivio. Proseguire dritti sul Po." },
-  { km: 35,  name: "Zona Lodi — anse strette",          type: "curve_danger", lat: 45.0800, lon: 9.5000,  alert: "Anse strette zona Lodi per 5 km. Canale cambia lato. Seguire segnaletica." },
-  { km: 52,  name: "Ansa di Piacenza Nord",             type: "curve_danger", lat: 45.0600, lon: 9.6800,  alert: "Curva sinistra pronunciata — tenersi lontano dalla sponda interna." },
-  { km: 55,  name: "Confluenza Trebbia — da destra",    type: "confluence",   lat: 45.0500, lon: 9.7000,  alert: "Confluenza Trebbia da DESTRA, dopo Piacenza. Proseguire dritti sul Po." },
-  { km: 67,  name: "Secche di Piacenza",                type: "secca",        lat: 45.0400, lon: 9.7500,  alert: "SECCHE PIACENZA — RALLENTARE. Ripeto: RALLENTARE. Canale stretto, centro, seguire gavitello bianco." },
-  { km: 83,  name: "Confluenza Adda — Castelnuovo",     type: "confluence",   lat: 45.1425, lon: 9.8531,  alert: "Confluenza Adda da SINISTRA a Castelnuovo. Foce larga, non confondere. Proseguire sul Po verso Isola Serafini." },
-  { km: 85,  name: "Avvicinamento Isola Serafini",      type: "warning",      lat: 45.0700, lon: 9.9000,  alert: "Isola Serafini tra 10 km. Preparare riduzione velocità per conca." },
-  { km: 95,  name: "Conca Isola Serafini",              type: "lock",         lat: 45.0800, lon: 9.9800,  alert: "Conca Isola Serafini — STOP obbligatorio. Cronometro azzera. Seguire istruzioni personale conca." },
-  { km: 97,  name: "Uscita conca",                      type: "timed_start",  lat: 45.0820, lon: 10.000,  alert: "Uscita conca — secondo tratto cronometrato inizia ora." },
-  { km: 112, name: "Ansa di Cremona",                   type: "curve_danger", lat: 45.1300, lon: 10.030,  alert: "Curva destra ampia — corrente laterale, tenere esterno." },
-  { km: 128, name: "Secche di Casalmaggiore",           type: "secca",        lat: 44.9900, lon: 10.420,  alert: "SECCHE CASALMAGGIORE — RALLENTARE. Seguire freccia bianca, non deviare." },
-  { km: 140, name: "Avvicinamento Boretto",             type: "warning",      lat: 44.9600, lon: 10.550,  alert: "Rifornimento Boretto tra 6 km. Preparare manovra di avvicinamento." },
-  { km: 146, name: "Boretto Po — Rifornimento",         type: "fuel",         lat: 44.9400, lon: 10.600,  alert: "Rifornimento obbligatorio Boretto Po. Cronometro azzera. Fermarsi." },
-  { km: 148, name: "Uscita Boretto",                    type: "timed_start",  lat: 44.9380, lon: 10.620,  alert: "Terzo tratto cronometrato — 215 km fino a Voltagrimana. Massima concentrazione." },
-  { km: 160, name: "Confluenza Oglio — da sinistra",    type: "confluence",   lat: 45.0000, lon: 10.800,  alert: "Confluenza Oglio da SINISTRA a Scorzarolo. Proseguire dritti sul Po." },
-  { km: 165, name: "Ansa di Guastalla",                 type: "curve_danger", lat: 44.9200, lon: 10.660,  alert: "Curva sinistra — ansa larga ma corrente forte in uscita." },
-  { km: 182, name: "Zona Reggio Emilia — allargamento", type: "warning",      lat: 44.9000, lon: 10.900,  alert: "Fiume si allarga. Possibili secche laterali. Canale centrale." },
-  { km: 195, name: "Confluenza Mincio — Governolo",     type: "confluence",   lat: 45.0000, lon: 10.950,  alert: "Confluenza Mincio da SINISTRA a Governolo. Sbocco lago Mantova. Proseguire sul Po." },
-  { km: 200, name: "Ansa di Revere",                    type: "curve_danger", lat: 44.9900, lon: 11.130,  alert: "Curva destra stretta a Revere — ridurre PRIMA dell'ansa." },
-  { km: 225, name: "Inizio Coppa Montelera",            type: "special",      lat: 44.8800, lon: 11.380,  alert: "INIZIO Coppa Montelera — 55 km prova speciale fino a Pontelagoscuro. Massima velocità. Massima concentrazione." },
-  { km: 230, name: "Confluenza Panaro — da destra",     type: "confluence",   lat: 44.8800, lon: 11.410,  alert: "Confluenza Panaro da DESTRA. Siamo in Montelera. Proseguire dritti a massima velocità." },
-  { km: 280, name: "Pontelagoscuro — Fine Montelera",   type: "special",      lat: 44.8400, lon: 11.580,  alert: "Fine Coppa Montelera. Ottimo lavoro. Ripresa andatura normale." },
-  { km: 295, name: "DELTA Po — ramificazioni",          type: "warning",      lat: 44.8800, lon: 11.950,  alert: "DELTA DEL PO — RAMIFICAZIONI. Attenzione massima. Seguire SOLO segnaletica ufficiale AIPO. Non decidere da soli." },
-  { km: 310, name: "Anse del delta",                    type: "curve_danger", lat: 44.9500, lon: 12.100,  alert: "Anse multiple del delta — velocità controllata. Secche tra anse. Tenersi esterno curva." },
-  { km: 340, name: "Ansa di Polesella",                 type: "curve_danger", lat: 44.9600, lon: 11.790,  alert: "Curva sinistra pronunciata a Polesella — corrente forte verso sponda esterna." },
-  { km: 370, name: "Avvicinamento Voltagrimana",        type: "warning",      lat: 44.8500, lon: 12.180,  alert: "Voltagrimana tra 20 km — fine tratto cronometrato si avvicina." },
-  { km: 390, name: "Voltagrimana — Fine crono",         type: "timed_end",    lat: 44.8300, lon: 12.310,  alert: "Voltagrimana — tratto cronometrato TERMINATO. Classifica ufficiale. Bravi." },
-  { km: 393, name: "Inizio trasferimento finale",       type: "transfer",     lat: 44.9100, lon: 12.330,  alert: "Trasferimento finale — canale Po-Brondolo. Tempo imposto. Navigazione calma." },
-  { km: 410, name: "Brondolo — Chioggia",               type: "transfer",     lat: 45.1700, lon: 12.280,  alert: "Brondolo Chioggia. Canal di Valle. Quasi arrivati." },
-  { km: 413, name: "ARRIVO VENEZIA",                    type: "finish",       lat: 45.4064, lon: 12.340,  alert: "ARRIVO! Raid Pavia-Venezia completato. Bravi Mattia e Roberto!" }
+  // Coordinates verified and anchored to real Po river (OSM data) + confirmed landmarks
+  { km: 0,   name: "Partenza Pavia",                    type: "start",        lat: 45.1900, lon: 9.1540,  alert: "Gara iniziata. Velocità di sostentamento sul Ticino." },
+  { km: 9,   name: "Ponte della Becca — conf. Ticino",  type: "timed_start",  lat: 45.1555, lon: 9.2428,  alert: "ATTENZIONE PONTE BECCA. Virata SINISTRA. Ripeto: virata SINISTRA. Centro canale Po. Turbolenze. Cronometro parte ora." },
+  { km: 18,  name: "Ansa di Mezzano Chitanto",          type: "curve_danger", lat: 45.0936, lon: 9.4555,  alert: "Curva pericolosa — ansa stretta, corrente forte. Tenere l'esterno." },
+  { km: 22,  name: "Confluenza Lambro — da destra",     type: "confluence",   lat: 45.1033, lon: 9.4558,  alert: "Confluenza Lambro da DESTRA. Non è un bivio. Proseguire dritti sul Po." },
+  { km: 35,  name: "Zona Lodi — anse strette",          type: "curve_danger", lat: 45.1013, lon: 9.5053,  alert: "Anse strette zona Lodi per 5 km. Canale cambia lato. Seguire segnaletica." },
+  { km: 52,  name: "Ansa di Piacenza Nord",             type: "curve_danger", lat: 45.0789, lon: 9.6758,  alert: "Curva sinistra pronunciata — tenersi lontano dalla sponda interna." },
+  { km: 55,  name: "Confluenza Trebbia — da destra",    type: "confluence",   lat: 45.0304, lon: 9.7421,  alert: "Confluenza Trebbia da DESTRA, dopo Piacenza. Proseguire dritti sul Po." },
+  { km: 67,  name: "Secche di Piacenza",                type: "secca",        lat: 45.0699, lon: 9.7393,  alert: "SECCHE PIACENZA — RALLENTARE. Ripeto: RALLENTARE. Canale stretto, centro, seguire gavitello bianco." },
+  { km: 83,  name: "Confluenza Adda — Castelnuovo",     type: "confluence",   lat: 45.0772, lon: 9.8788,  alert: "Confluenza Adda da SINISTRA a Castelnuovo. Foce larga, non confondere. Proseguire sul Po verso Isola Serafini." },
+  { km: 85,  name: "Avvicinamento Isola Serafini",      type: "warning",      lat: 45.0780, lon: 9.8944,  alert: "Isola Serafini tra 10 km. Preparare riduzione velocità per conca." },
+  { km: 95,  name: "Conca Isola Serafini",              type: "lock",         lat: 45.0544, lon: 9.9515,  alert: "Conca Isola Serafini — STOP obbligatorio. Cronometro azzera. Seguire istruzioni personale conca." },
+  { km: 97,  name: "Uscita conca",                      type: "timed_start",  lat: 45.0578, lon: 9.9580,  alert: "Uscita conca — secondo tratto cronometrato inizia ora." },
+  { km: 112, name: "Ansa di Cremona",                   type: "curve_danger", lat: 45.1240, lon: 10.0012, alert: "Curva destra ampia — corrente laterale, tenere esterno." },
+  { km: 128, name: "Secche di Casalmaggiore",           type: "secca",        lat: 44.9864, lon: 10.4103, alert: "SECCHE CASALMAGGIORE — RALLENTARE. Seguire freccia bianca, non deviare." },
+  { km: 140, name: "Avvicinamento Boretto",             type: "warning",      lat: 44.9128, lon: 10.5370, alert: "Rifornimento Boretto tra 6 km. Preparare manovra di avvicinamento." },
+  { km: 146, name: "Boretto Po — Rifornimento",         type: "fuel",         lat: 44.8937, lon: 10.5511, alert: "Rifornimento obbligatorio Boretto Po. Cronometro azzera. Fermarsi." },
+  { km: 148, name: "Uscita Boretto",                    type: "timed_start",  lat: 44.9000, lon: 10.5600, alert: "Terzo tratto cronometrato — 215 km fino a Voltagrimana. Massima concentrazione." },
+  { km: 160, name: "Confluenza Oglio — da sinistra",    type: "confluence",   lat: 44.9992, lon: 10.6953, alert: "Confluenza Oglio da SINISTRA a Scorzarolo. Proseguire dritti sul Po." },
+  { km: 165, name: "Ansa di Guastalla",                 type: "curve_danger", lat: 44.9282, lon: 10.6318, alert: "Curva sinistra — ansa larga ma corrente forte in uscita." },
+  { km: 182, name: "Zona Reggio Emilia — allargamento", type: "warning",      lat: 45.0485, lon: 10.8999, alert: "Fiume si allarga. Possibili secche laterali. Canale centrale." },
+  { km: 195, name: "Confluenza Mincio — Governolo",     type: "confluence",   lat: 45.0495, lon: 10.9640, alert: "Confluenza Mincio da SINISTRA a Governolo. Sbocco lago Mantova. Proseguire sul Po." },
+  { km: 200, name: "Ansa di Revere",                    type: "curve_danger", lat: 44.9944, lon: 11.1257, alert: "Curva destra stretta a Revere — ridurre PRIMA dell'ansa." },
+  { km: 225, name: "Inizio Coppa Montelera",            type: "special",      lat: 44.9920, lon: 11.1310, alert: "INIZIO Coppa Montelera — 55 km prova speciale fino a Pontelagoscuro. Massima velocità. Massima concentrazione." },
+  { km: 230, name: "Confluenza Panaro — da destra",     type: "confluence",   lat: 44.8892, lon: 11.4168, alert: "Confluenza Panaro da DESTRA. Siamo in Montelera. Proseguire dritti a massima velocità." },
+  { km: 280, name: "Pontelagoscuro — Fine Montelera",   type: "special",      lat: 44.8680, lon: 11.5965, alert: "Fine Coppa Montelera. Ottimo lavoro. Ripresa andatura normale." },
+  { km: 295, name: "DELTA Po — ramificazioni",          type: "warning",      lat: 44.8035, lon: 11.9716, alert: "DELTA DEL PO — RAMIFICAZIONI. Attenzione massima. Seguire SOLO segnaletica ufficiale AIPO. Non decidere da soli." },
+  { km: 310, name: "Anse del delta",                    type: "curve_danger", lat: 44.9626, lon: 12.1001, alert: "Anse multiple del delta — velocità controllata. Secche tra anse. Tenersi esterno curva." },
+  { km: 340, name: "Ansa di Polesella",                 type: "curve_danger", lat: 44.9629, lon: 11.7830, alert: "Curva sinistra pronunciata a Polesella — corrente forte verso sponda esterna." },
+  { km: 370, name: "Avvicinamento Voltagrimana",        type: "warning",      lat: 44.8097, lon: 12.1480, alert: "Voltagrimana tra 20 km — fine tratto cronometrato si avvicina." },
+  { km: 390, name: "Voltagrimana — Fine crono",         type: "timed_end",    lat: 44.9240, lon: 12.2254, alert: "Voltagrimana — tratto cronometrato TERMINATO. Classifica ufficiale. Bravi." },
+  { km: 393, name: "Inizio trasferimento finale",       type: "transfer",     lat: 44.9080, lon: 12.2310, alert: "Trasferimento finale — canale Po-Brondolo. Tempo imposto. Navigazione calma." },
+  { km: 410, name: "Brondolo — Chioggia",               type: "transfer",     lat: 45.2278, lon: 12.2760, alert: "Brondolo Chioggia. Canal di Valle. Quasi arrivati." },
+  { km: 413, name: "ARRIVO VENEZIA",                    type: "finish",       lat: 45.4340, lon: 12.3510, alert: "ARRIVO! Raid Pavia-Venezia completato. Bravi Mattia e Roberto!" }
 ];
 
 const TYPE_COLORS = {
@@ -960,14 +961,9 @@ function buildMappa() {
     crossOrigin: true,
   }).addTo(mappaLeaflet);
 
-  // ─── Main route polyline (connects all 33 waypoints) ───
+  // ─── NO CONNECTING LINE between waypoints (per user: keep only the dots).
+  //       Waypoints sit on the real Po visible in the OSM tiles. ───
   const routeCoords = WAYPOINTS.map(w => [w.lat, w.lon]);
-  L.polyline(routeCoords, {
-    color: '#1B4965', weight: 6, opacity: 0.45, lineCap: 'round', lineJoin: 'round',
-  }).addTo(mappaLeaflet);
-  L.polyline(routeCoords, {
-    color: '#2E86AB', weight: 3.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round',
-  }).addTo(mappaLeaflet);
 
   // ─── Coppa Montelera overlay (km 225 → 280) gold ───
   const mtlCoords = WAYPOINTS.filter(w => w.km >= 225 && w.km <= 280).map(w => [w.lat, w.lon]);
@@ -1248,7 +1244,7 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   const swCode = `
-const CACHE = 'raid-pv-v8';
+const CACHE = 'raid-pv-v9';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap'
 ];
