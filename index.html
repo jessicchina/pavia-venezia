@@ -959,11 +959,16 @@ const WAYPOINTS = [
   { km: 145, name: "Uscita Torricella", type: "timed_start", lat: 44.98420, lon: 10.31794, alert: "Tratto cronometrato finale — fino a Volta Grimana. Massima concentrazione." },
   { km: 160, name: "Confluenza Oglio — da sinistra", type: "confluence", lat: 44.94223, lon: 10.42860, alert: "Confluenza Oglio da SINISTRA a Scorzarolo. Proseguire dritti sul Po." },
   { km: 180, name: "Zona Guastalla/Borgoforte", type: "curve_danger", lat: 44.93817, lon: 10.63580, alert: "Anse larghe — corrente forte in uscita. Tenere esterno." },
+  { km: 204, name: "Secca AIPO Valle Curva N14 — 2 boe rosse", type: "secca", lat: 45.04650, lon: 10.76620, alert: "SECCA AIPO Valle Curva N14 — 2 BOE ROSSE. Rallentare. Seguire segnaletica bianca al centro." },
   { km: 210, name: "Confluenza Mincio — Governolo", type: "confluence", lat: 45.04116, lon: 10.83130, alert: "Confluenza Mincio da SINISTRA a Governolo. Sbocco lago Mantova. Proseguire sul Po." },
   { km: 242, name: "Inizio Coppa Montelera (Revere)", type: "special", lat: 45.05342, lon: 11.13631, alert: "INIZIO Coppa Montelera — 55 km prova speciale fino a Pontelagoscuro. Massima velocità. Massima concentrazione." },
+  { km: 247, name: "Secca AIPO Mericonda — 2 boe rosse", type: "secca", lat: 45.05740, lon: 11.19990, alert: "SECCA AIPO Mericonda — 2 BOE ROSSE. Siamo in Montelera. RALLENTARE. Seguire segnaletica bianca." },
   { km: 255, name: "Confluenza Panaro — da destra", type: "confluence", lat: 45.05121, lon: 11.27090, alert: "Confluenza Panaro da DESTRA. Siamo in Montelera. Proseguire dritti a massima velocità." },
+  { km: 260, name: "Secca AIPO Bosco Caposotto — 3 boe rosse", type: "secca", lat: 45.01580, lon: 11.28960, alert: "SECCA CRITICA AIPO Bosco Caposotto — 3 BOE ROSSE. Ripeto: 3 BOE ROSSE. RALLENTARE. Centro canale, seguire segnaletica bianca." },
+  { km: 266, name: "Secca AIPO Felonica — 2 boe rosse", type: "secca", lat: 44.98720, lon: 11.34780, alert: "SECCA AIPO Felonica — 2 BOE ROSSE. RALLENTARE. Seguire segnaletica bianca." },
   { km: 296, name: "Pontelagoscuro — Fine Montelera", type: "special", lat: 44.88817, lon: 11.61299, alert: "Fine Coppa Montelera. Ottimo lavoro. Ripresa andatura normale." },
   { km: 310, name: "Ansa di Polesella", type: "curve_danger", lat: 44.95201, lon: 11.74085, alert: "Curva sinistra pronunciata a Polesella — corrente forte verso sponda esterna." },
+  { km: 321, name: "Secca AIPO Crespino — 2 boe rosse", type: "secca", lat: 44.97480, lon: 11.87880, alert: "SECCA AIPO Crespino — 2 BOE ROSSE. RALLENTARE. Seguire segnaletica bianca." },
   { km: 325, name: "DELTA Po — ramificazioni", type: "warning", lat: 44.97590, lon: 11.91490, alert: "DELTA DEL PO — RAMIFICAZIONI. Attenzione massima. Seguire SOLO segnaletica ufficiale AIPO. Non decidere da soli." },
   { km: 340, name: "Anse del delta", type: "curve_danger", lat: 44.99365, lon: 12.08206, alert: "Anse multiple del delta — velocità controllata. Secche tra anse. Tenersi esterno curva." },
   { km: 348, name: "Avvicinamento Volta Grimana", type: "warning", lat: 45.01928, lon: 12.13470, alert: "Volta Grimana tra 5 km — fine tratto cronometrato si avvicina." },
@@ -1066,7 +1071,9 @@ function clearAlert() {
 // ═══════════════════════════════════════════════
 // I 5 punti più critici dell'intera gara — avviso anticipato a 2000m
 // e ripetizione vocale a 200m. Vita di Mattia > cortesia sonora.
-const CRITICAL_KM = new Set([9, 67, 128, 295, 310]);
+// Includes: km 9 Becca, 67/128 secche storiche, 204/247/260/266/321 AIPO hotspots (boe rosse 20/04/2026),
+// 295 Delta ramificazioni, 310 Polesella.
+const CRITICAL_KM = new Set([9, 67, 128, 204, 247, 260, 266, 295, 310, 321, 325]);
 function isCritical(wpt) { return CRITICAL_KM.has(wpt.km); }
 
 function checkWaypointAlerts(distM, wptIdx) {
@@ -1674,7 +1681,7 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   const swCode = `
-const CACHE = 'raid-pv-v12';
+const CACHE = 'raid-pv-v13';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap'
 ];
