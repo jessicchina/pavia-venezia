@@ -441,9 +441,9 @@
   <div id="segnaletica-panel">
     <div id="seg-title">📌 Segnaletica Fiume</div>
     <button id="seg-close" onclick="hideSegnaletica()">✕</button>
-    <a class="seg-portolano" href="https://www.portolanodelpo.it/app/" target="_blank" rel="noopener">
+    <a class="seg-portolano" href="https://www.portolanodelpo.it/" target="_blank" rel="noopener">
       <span class="sp-icon">🌐</span>
-      <div class="sp-title">Portolano del Po — carta nautica ufficiale<div class="sp-sub">AIPO · Boe, idrometri, avvisi · Tocca → Digital Nautical Chart</div></div>
+      <div class="sp-title">Portolano del Po — carta nautica ufficiale<div class="sp-sub">AIPO · Apri app Portolano o versione web</div></div>
       <span>›</span>
     </a>
     <div class="seg-item"><span class="seg-icon">🔴</span><span class="seg-text seg-danger">Freccia/rombo <strong>ROSSO</strong> → secca, stai lontano</span></div>
@@ -1701,7 +1701,7 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   const swCode = `
-const CACHE = 'raid-pv-v14';
+const CACHE = 'raid-pv-v15';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap'
 ];
