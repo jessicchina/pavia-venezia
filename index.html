@@ -1314,9 +1314,16 @@ function startDemo() {
   document.getElementById('gps-status').textContent = '● DEMO';
   document.getElementById('gps-status').className = 'gps-weak';
 
-  // Simulate ~120 km/h → 2 km per second → but we speed it up for demo: 0.5km per 500ms
+  // Prime iOS Safari speech synthesis inside this user-gesture handler.
+  // Without this, subsequent speak() calls from the setInterval below are
+  // silently blocked by iOS because they're not tied to a user interaction.
+  speak("Demo mode avviato");
+
+  // Demo speed: 0.25 km per 500ms tick = 500 m/s simulated. Slow enough
+  // that voice alerts (2-3 seconds each) can complete before the next one,
+  // fast enough that the full 371 km course finishes in ~12 minutes.
   state.demoInterval = setInterval(() => {
-    state.demoKm += 0.8; // 0.8km per tick, ~100 ticks/min => simulates fast race
+    state.demoKm += 0.25;
     if (state.demoKm > 413) { state.demoKm = 0; state.nextWptIdx = 1; state.lastAlertKm = {}; }
     // Simulate speed variation
     const baseSpeed = 110 + Math.sin(state.demoKm * 0.3) * 25 + (Math.random() - 0.5) * 10;
@@ -1715,7 +1722,7 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   const swCode = `
-const CACHE = 'raid-pv-v17';
+const CACHE = 'raid-pv-v18';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap'
 ];
