@@ -1493,14 +1493,12 @@ function buildMappa() {
     });
     const marker = L.marker([w.lat, w.lon], { icon, title: w.name }).addTo(mappaLeaflet);
 
-    // Popup with full safety info + link to Sporttraxx for 2026
+    // Popup with full safety info — km, type, name, voice alert
     const typeLabel = mappaTypeLabel(w);
-    const sporttraxxUrl = `https://tracking.sporttraxx.com/races/pavia-venezia-2026/map2d/`;
     const popupHtml = `
       <div class="pp-km">KM ${w.km} · ${typeLabel}</div>
       <div class="pp-name">${w.name}</div>
       <div class="pp-alert">${w.alert}</div>
-      <a href="${sporttraxxUrl}" target="_blank" rel="noopener" style="display:block;margin-top:8px;padding:5px 8px;background:#2E86AB;color:white;text-decoration:none;font-weight:800;font-size:10px;letter-spacing:1px;border-radius:4px;text-align:center;">🌐 MONITORAGGIO IN DIRETTA — SPORTTRAXX</a>
     `;
     marker.bindPopup(popupHtml, { maxWidth: 260, autoPanPadding: [20, 60] });
     marker.on('click', () => mappaShowInfo(w));
@@ -1745,7 +1743,7 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   const swCode = `
-const CACHE = 'raid-pv-v19';
+const CACHE = 'raid-pv-v20';
 const FONTS = [
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap'
 ];
