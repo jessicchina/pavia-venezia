@@ -449,7 +449,6 @@
   <div id="bottom-bar">
     <button class="btn" id="btn-secca" onclick="toggleSecca()">🚨 SECCA<br>MANUALE</button>
     <button class="btn" id="btn-mappa" onclick="showMappa()">🗺 MAPPA<br>PO</button>
-    <button class="btn" id="btn-compass" onclick="window.compassMode = !window.compassMode; this.innerHTML = window.compassMode ? '🧭 NORD<br>AVANTI' : '🧭 NORD<br>SU'; if (!window.compassMode && mappaLeaflet) { try { mappaLeaflet.setBearing(0); } catch(e) {} }">🧭 NORD<br>AVANTI</button>
     <button class="btn" id="btn-panel" onclick="showSegnaletica()">📋 SEGNI<br>ACQUA</button>
     <button class="btn" id="btn-demo" onclick="toggleDemo()">▶ PROVA<br>DEMO</button>
     <button id="btn-sos" onclick="callSOS()">🆘 SOS</button>
@@ -1472,10 +1471,14 @@ function buildMappa() {
     worldCopyJump: false,
     maxBoundsViscosity: 0.5,
     // ─── HEADING-UP (compass) MODE ───
-    rotate: true,             // enable rotation
-    rotateControl: { closeOnZeroBearing: false },  // touch rotation control
-    bearing: 0,               // initial bearing
-    touchRotate: true,        // 2-finger twist rotation
+    rotate: true,                // enable rotation
+    rotateControl: {             // compass control overlaid on the map
+      closeOnZeroBearing: false, // keep visible even at north-up
+      position: 'topleft'        // top-left of map (next to zoom)
+    },
+    bearing: 0,                  // start north-up
+    touchRotate: true,           // 2-finger twist
+    shiftKeyRotate: true         // shift-drag to rotate on desktop
   });
   // Compass mode state — auto-rotate map to GPS heading when on
   window.compassMode = true;  // ON by default for piloting
