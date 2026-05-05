@@ -260,7 +260,7 @@
     padding: 10px 8px 8px;
   }
   #mappa-panel.open { display: flex; }
-  #mappa-header { position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-shrink: 0; min-height: 84px; }
+  #mappa-header { position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-shrink: 0; min-height: 0; }
   #mappa-title { font-size: 14px; font-weight: 900; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; }
   #mappa-close { flex-shrink: 0; }
   #leaflet-map {
@@ -490,10 +490,15 @@
   <div id="mappa-panel">
     <div id="mappa-header">
       <div id="mappa-title">🗺 Mappa Po · 413 km</div>
-      <div id="mappa-speed" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:'Barlow Condensed';font-weight:900;font-size:72px;color:#ff7b1c;letter-spacing:3px;line-height:1;text-shadow:0 0 8px rgba(0,0,0,0.95), 0 2px 4px rgba(0,0,0,0.8);"><span id="mappa-speed-val">0</span><span style="font-size:28px;color:#ffb380;font-weight:800;margin-left:6px;letter-spacing:1px;">km/h</span></div>
+      
       <button id="mappa-close" onclick="hideMappa()">✕</button>
     </div>
     <div id="leaflet-map"></div>
+    <div id="mappa-speed-overlay" style="position:absolute;top:54px;right:14px;z-index:1100;pointer-events:none;background:rgba(0,0,0,0.55);padding:4px 12px 6px;border-radius:10px;border:2px solid #ff7b1c;line-height:1;font-family:'Barlow Condensed';font-weight:900;color:#ff7b1c;text-shadow:0 0 4px rgba(0,0,0,0.7);">
+      <span id="mappa-speed-val" style="font-size:62px;letter-spacing:2px;">0</span>
+      <span style="font-size:18px;color:#ffb380;font-weight:800;margin-left:4px;">km/h</span>
+    </div>
+
     <div id="mappa-info" class="empty">Tocca un punto per vederne i dettagli</div>
     <div id="mappa-legend">
       <div class="mappa-leg-item"><span class="mappa-leg-dot" style="background:#ff3b3b"></span>CRITICO</div>
