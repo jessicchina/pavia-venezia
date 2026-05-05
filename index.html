@@ -260,7 +260,7 @@
     padding: 10px 8px 8px;
   }
   #mappa-panel.open { display: flex; }
-  #mappa-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-shrink: 0; }
+  #mappa-header { position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-shrink: 0; }
   #mappa-title { font-size: 14px; font-weight: 900; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; }
   #mappa-close { flex-shrink: 0; }
   #leaflet-map {
@@ -485,6 +485,7 @@
   <div id="mappa-panel">
     <div id="mappa-header">
       <div id="mappa-title">🗺 Mappa Po · 413 km</div>
+      <div id="mappa-speed" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:'Barlow Condensed';font-weight:900;font-size:24px;color:var(--cyan);letter-spacing:1px;line-height:1;text-shadow:0 0 4px rgba(0,0,0,0.8);"><span id="mappa-speed-val">0</span><span style="font-size:13px;color:var(--muted);font-weight:700;margin-left:4px;">km/h</span></div>
       <button id="mappa-close" onclick="hideMappa()">✕</button>
     </div>
     <div id="leaflet-map"></div>
@@ -1300,6 +1301,10 @@ function startGPS() {
 
       const speedMs = pos.coords.speed || 0;
       const speedKmh = speedMs * 3.6;
+
+      // Update speed in map view header (when map is open)
+      const mappaSpeedEl = document.getElementById('mappa-speed-val');
+      if (mappaSpeedEl) mappaSpeedEl.textContent = Math.round(speedKmh);
 
       const kmEst = estimateKmFromGPS(state.lat, state.lon);
       updateDisplay(kmEst, speedKmh);
