@@ -177,7 +177,22 @@
   #btn-secca.active { animation: flashRed 0.4s infinite alternate; }
   #btn-mappa { background: var(--bg3); color: var(--green); border: 1px solid rgba(0,255,136,0.3); font-size: 11px; }
   #btn-panel { background: var(--bg3); color: var(--cyan); border: 1px solid rgba(0,212,255,0.3); font-size: 11px; }
-  #btn-demo { background: var(--bg3); color: var(--gold); border: 1px solid rgba(255,215,0,0.3); font-size: 10px; }
+  #btn-registra { background: var(--bg3); color: #ff7b1c; border: 1px solid rgba(255,123,28,0.4); font-size: 10px; }
+  #btn-registra.recording { background: #ff7b1c; color: #000; border-color: #ff7b1c; animation: recBlink 1.2s infinite; }
+  #btn-esporta { background: var(--bg3); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); font-size: 10px; }
+  #btn-esporta:disabled { opacity: 0.35; cursor: not-allowed; }
+  @keyframes recBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+  #rec-indicator {
+    position: fixed; top: 8px; right: 12px; z-index: 1500;
+    background: rgba(0,0,0,0.7); color: #ff3b3b; font-family: 'Barlow Condensed';
+    font-weight: 900; font-size: 13px; padding: 4px 10px; border-radius: 6px;
+    border: 1px solid #ff3b3b; display: none; align-items: center; gap: 6px;
+  }
+  #rec-indicator.on { display: inline-flex; }
+  #rec-indicator::before {
+    content: ''; display: inline-block; width: 8px; height: 8px;
+    background: #ff3b3b; border-radius: 50%; animation: recBlink 1s infinite;
+  }
   #btn-sos { flex: 0 0 auto; padding: 10px 12px; background: var(--red); color: white; font-size: 14px; border-radius: 10px; border: none; font-family: 'Barlow Condensed'; font-weight: 900; letter-spacing: 1px; cursor: pointer; }
 
   /* ─── SEGNALETICA PANEL ─── */
@@ -406,6 +421,9 @@
   <!-- Alert banner -->
   <div id="alert-banner"></div>
 
+  <!-- Recording indicator (top-right when recording GPS track) -->
+  <div id="rec-indicator">REC 0 pts</div>
+
   <!-- Secca banner -->
   <div id="secca-banner">⚠ ACQUA BASSA — RALLENTARE ⚠</div>
 
@@ -455,7 +473,8 @@
     <button class="btn" id="btn-secca" onclick="toggleSecca()">🚨 SECCA<br>MANUALE</button>
     <button class="btn" id="btn-mappa" onclick="showMappa()">🗺 MAPPA<br>PO</button>
     <button class="btn" id="btn-panel" onclick="showSegnaletica()">📋 SEGNI<br>ACQUA</button>
-    <button class="btn" id="btn-demo" onclick="toggleDemo()">▶ PROVA<br>DEMO</button>
+    <button class="btn" id="btn-registra" onclick="toggleRecording()">⏺ REGISTRA<br>TRACCIA</button>
+    <button class="btn" id="btn-esporta" onclick="exportTrackGPX()">📤 ESPORTA<br>GPX</button>
     <button id="btn-sos" onclick="callSOS()">🆘 SOS</button>
   </div>
 
@@ -1324,6 +1343,29 @@ function startGPS() {
       if (acc < 15) { gpsEl.textContent = '● GPS'; gpsEl.className = 'gps-ok'; }
       else if (acc < 40) { gpsEl.textContent = '● GPS~'; gpsEl.className = 'gps-weak'; }
       else { gpsEl.textContent = '● GPS?'; gpsEl.className = 'gps-none'; }
+
+      // Track recording — append point if recording is active (rate-limited to ~2s)
+      if (window.recState && window.recState.active) {
+        const now = Date.now();
+        if (!window.recState.lastT || now - window.recState.lastT >= 2000) {
+          const pt = {
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
+            t: Math.floor(now / 1000),
+            spd: speedKmh,
+            acc: acc,
+          };
+          window.recState.points.push(pt);
+          window.recState.lastT = now;
+          // Persist every 5 points (every ~10s) to localStorage
+          if (window.recState.points.length % 5 === 0) {
+            try { localStorage.setItem('mattia_track', JSON.stringify(window.recState.points)); } catch(e) {}
+          }
+          // Update indicator
+          const ind = document.getElementById('rec-indicator');
+          if (ind) ind.textContent = 'REC ' + window.recState.points.length + ' pts';
+        }
+      }
     },
     (err) => {
       document.getElementById('gps-status').textContent = '● NO GPS';
@@ -1332,6 +1374,111 @@ function startGPS() {
     { enableHighAccuracy: true, maximumAge: 1000, timeout: 5000 }
   );
 }
+
+// ═══════════════════════════════════════════════
+// TRACK RECORDING (REGISTRA TRACCIA)
+// ═══════════════════════════════════════════════
+window.recState = { active: false, points: [], lastT: 0 };
+
+function updateExportButton() {
+  const btnExp = document.getElementById('btn-esporta');
+  if (!btnExp) return;
+  const n = (window.recState && window.recState.points) ? window.recState.points.length : 0;
+  if (n > 0) {
+    btnExp.disabled = false;
+    btnExp.innerHTML = '📤 ESPORTA<br>(' + n + ')';
+  } else {
+    btnExp.disabled = true;
+    btnExp.innerHTML = '📤 ESPORTA<br>GPX';
+  }
+}
+
+function toggleRecording() {
+  const btn = document.getElementById('btn-registra');
+  const ind = document.getElementById('rec-indicator');
+
+  if (window.recState.active) {
+    // STOP recording (do NOT auto-export — user uses the dedicated ESPORTA button)
+    window.recState.active = false;
+    try { localStorage.setItem('mattia_track', JSON.stringify(window.recState.points)); } catch(e) {}
+    btn.classList.remove('recording');
+    btn.innerHTML = '⏺ REGISTRA<br>TRACCIA';
+    if (ind) ind.classList.remove('on');
+    updateExportButton();
+    alert('Registrazione fermata. ' + window.recState.points.length + ' punti salvati.\nUsa il pulsante ESPORTA per scaricare il file GPX.');
+    return;
+  }
+
+  // START
+  let existing = [];
+  try {
+    const saved = localStorage.getItem('mattia_track');
+    if (saved) existing = JSON.parse(saved) || [];
+  } catch(e) {}
+  if (existing.length > 0) {
+    if (confirm('Esiste una traccia salvata di ' + existing.length + ' punti.\n\nContinua a registrare aggiungendo nuovi punti? (Annulla = elimina e inizia da zero)')) {
+      window.recState.points = existing;
+    } else {
+      window.recState.points = [];
+      try { localStorage.removeItem('mattia_track'); } catch(e) {}
+    }
+  } else {
+    window.recState.points = [];
+  }
+  window.recState.active = true;
+  window.recState.lastT = 0;
+  btn.classList.add('recording');
+  btn.innerHTML = '⏹ FERMA<br>TRACCIA';
+  if (ind) {
+    ind.classList.add('on');
+    ind.textContent = 'REC ' + window.recState.points.length + ' pts';
+  }
+  updateExportButton();
+  if (typeof requestWakeLock === 'function') requestWakeLock();
+  alert('Registrazione attiva. Tieni il telefono visibile e l\'app in primo piano. Lo schermo resterà acceso (Wake Lock).');
+}
+
+function exportTrackGPX() {
+  const pts = window.recState.points || [];
+  if (pts.length === 0) { alert('Nessun punto da esportare.'); return; }
+  // Build GPX XML
+  const date = new Date().toISOString();
+  let gpx = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  gpx += '<gpx version="1.1" creator="Raid Pavia-Venezia Navigator" xmlns="http://www.topografix.com/GPX/1/1">\n';
+  gpx += '  <metadata><time>' + date + '</time><name>Mattia track ' + new Date().toLocaleString('it-IT') + '</name></metadata>\n';
+  gpx += '  <trk><name>Raid Pavia-Venezia 2026</name><trkseg>\n';
+  pts.forEach(p => {
+    const t = new Date(p.t * 1000).toISOString();
+    gpx += '    <trkpt lat="' + p.lat.toFixed(6) + '" lon="' + p.lon.toFixed(6) + '">';
+    gpx += '<time>' + t + '</time>';
+    if (p.spd != null) gpx += '<extensions><speed>' + (p.spd / 3.6).toFixed(2) + '</speed></extensions>';
+    gpx += '</trkpt>\n';
+  });
+  gpx += '  </trkseg></trk>\n</gpx>\n';
+
+  // Download as file
+  const blob = new Blob([gpx], { type: 'application/gpx+xml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'mattia-track-' + Math.floor(Date.now()/1000) + '.gpx';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+  alert(pts.length + ' punti esportati come GPX.');
+}
+
+// Restore recording state on load (track persists in localStorage across app reloads)
+window.addEventListener('load', () => {
+  try {
+    const saved = localStorage.getItem('mattia_track');
+    if (saved) {
+      const pts = JSON.parse(saved) || [];
+      if (pts.length > 0) window.recState.points = pts;
+    }
+  } catch(e) {}
+  updateExportButton();
+});
 
 // ═══════════════════════════════════════════════
 // DEMO MODE
