@@ -1,9 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 40" width="16" height="40">
-  <!-- Tall red-white striped vertical pole (5 stripes alternating, top is red) -->
-  <rect x="5" y="0"  width="6" height="6.7" fill="#e53935" stroke="black" stroke-width="0.6"/>
-  <rect x="5" y="6.7" width="6" height="6.7" fill="white"   stroke="black" stroke-width="0.6"/>
-  <rect x="5" y="13.3" width="6" height="6.7" fill="#e53935" stroke="black" stroke-width="0.6"/>
-  <rect x="5" y="20.0" width="6" height="6.7" fill="white"   stroke="black" stroke-width="0.6"/>
-  <rect x="5" y="26.7" width="6" height="6.7" fill="#e53935" stroke="black" stroke-width="0.6"/>
-  <rect x="5" y="33.3" width="6" height="6.7" fill="white"   stroke="black" stroke-width="0.6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 44" width="32" height="44">
+  <rect x="6" y="36" width="20" height="6" rx="1" fill="#8B4513" stroke="#000" stroke-width="0.5"/>
+  <rect x="14.5" y="20" width="3" height="18" fill="#fff" stroke="#000" stroke-width="0.4"/>
+  <!-- Green inverted triangle -->
+  <polygon points="4,4 28,4 16,24" fill="#2e7d32" stroke="#000" stroke-width="1"/>
 </svg>
