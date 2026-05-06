@@ -1397,14 +1397,30 @@ function toggleRecording() {
   const ind = document.getElementById('rec-indicator');
 
   if (window.recState.active) {
-    // STOP recording (do NOT auto-export — user uses the dedicated ESPORTA button)
+    // STOP recording — ask Mattia to KEEP or DISCARD the points
     window.recState.active = false;
-    try { localStorage.setItem('mattia_track', JSON.stringify(window.recState.points)); } catch(e) {}
     btn.classList.remove('recording');
     btn.innerHTML = '⏺ REGISTRA<br>TRACCIA';
     if (ind) ind.classList.remove('on');
+    const n = window.recState.points.length;
+    if (n === 0) {
+      // Nothing recorded — silent stop
+      updateExportButton();
+      return;
+    }
+    const keep = confirm(
+      'Registrazione fermata.\n' +
+      n + ' punti GPS registrati.\n\n' +
+      'OK = MANTIENI la traccia (poi tocca ESPORTA per inviarla)\n' +
+      'Annulla = CANCELLA e ricomincia da zero'
+    );
+    if (keep) {
+      try { localStorage.setItem('mattia_track', JSON.stringify(window.recState.points)); } catch(e) {}
+    } else {
+      window.recState.points = [];
+      try { localStorage.removeItem('mattia_track'); } catch(e) {}
+    }
     updateExportButton();
-    alert('Registrazione fermata. ' + window.recState.points.length + ' punti salvati.\nUsa il pulsante ESPORTA per scaricare il file GPX.');
     return;
   }
 
