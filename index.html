@@ -470,7 +470,6 @@
 
   <!-- Bottom buttons -->
   <div id="bottom-bar">
-    <button class="btn" id="btn-secca" onclick="toggleSecca()">🚨 SECCA<br>MANUALE</button>
     <button class="btn" id="btn-mappa" onclick="showMappa()">🗺 MAPPA<br>PO</button>
     <button class="btn" id="btn-panel" onclick="showSegnaletica()">📋 SEGNI<br>ACQUA</button>
     <button class="btn" id="btn-registra" onclick="toggleRecording()">⏺ REGISTRA<br>TRACCIA</button>
@@ -1438,9 +1437,10 @@ function toggleRecording() {
   alert('Registrazione attiva. Tieni il telefono visibile e l\'app in primo piano. Lo schermo resterà acceso (Wake Lock).');
 }
 
-function exportTrackGPX() {
+async function exportTrackGPX() {
   const pts = window.recState.points || [];
-  if (pts.length === 0) { alert('Nessun punto da esportare.'); return; }
+  if (pts.length === 0) { alert('Nessun punto da esportare. Registra una traccia prima.'); return; }
+
   // Build GPX XML
   const date = new Date().toISOString();
   let gpx = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -1456,16 +1456,51 @@ function exportTrackGPX() {
   });
   gpx += '  </trkseg></trk>\n</gpx>\n';
 
-  // Download as file
+  const fileName = 'mattia-track-' + Math.floor(Date.now()/1000) + '.gpx';
   const blob = new Blob([gpx], { type: 'application/gpx+xml' });
+
+  // Preferred: Web Share API — opens iOS share sheet (WhatsApp, AirDrop, Mail, etc.)
+  // Note: iOS doesn't allow .gpx files for some apps, so we also send a text fallback
+  try {
+    const file = new File([blob], fileName, { type: 'application/gpx+xml' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'Traccia Raid Pavia-Venezia',
+        text: pts.length + ' punti GPS · Raid Pavia-Venezia 2026'
+      });
+      return;
+    }
+  } catch(err) {
+    if (err.name === 'AbortError') return;  // user cancelled
+  }
+
+  // Fallback 1: share without file (just URL/text — some apps work)
+  if (navigator.share) {
+    try {
+      // Some iOS versions can share Blob URLs in messaging apps
+      const url = URL.createObjectURL(blob);
+      await navigator.share({
+        title: 'Traccia Raid Pavia-Venezia',
+        text: pts.length + ' punti GPS · ' + fileName,
+        url: url,
+      });
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      return;
+    } catch(err) {
+      if (err.name === 'AbortError') return;
+    }
+  }
+
+  // Fallback 2: regular download (file goes to Files → Downloads)
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'mattia-track-' + Math.floor(Date.now()/1000) + '.gpx';
+  a.download = fileName;
   document.body.appendChild(a);
   a.click();
   setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
-  alert(pts.length + ' punti esportati come GPX.');
+  alert(pts.length + ' punti scaricati come ' + fileName + '.\nIl file è in Files → Download.');
 }
 
 // Restore recording state on load (track persists in localStorage across app reloads)
