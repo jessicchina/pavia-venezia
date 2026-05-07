@@ -416,7 +416,7 @@
   <div id="topbar">
     <div id="race-title">Raid Pavia·Venezia</div>
     <div id="time-display">--:--</div>
-    <div id="gps-status" class="gps-none">● GPS</div>
+    <div id="gps-status" class="gps-none" onclick="document.getElementById('gps-debug').classList.toggle('on')">● GPS</div>
   </div>
 
   <!-- Alert banner -->
@@ -424,6 +424,15 @@
 
   <!-- Recording indicator (top-right when recording GPS track) -->
   <div id="rec-indicator">REC 0 pts</div>
+
+  <!-- GPS debug panel (tap GPS badge to toggle) -->
+  <div id="gps-debug" style="display:none;position:fixed;top:40px;right:8px;z-index:1500;background:rgba(0,0,0,0.85);color:#0f0;font-family:monospace;font-size:11px;padding:6px 8px;border-radius:6px;border:1px solid #0f0;max-width:220px;line-height:1.3;">
+    Tap GPS badge to start
+  </div>
+  <style>
+    #gps-debug.on { display: block !important; }
+    #gps-status { cursor: pointer; }
+  </style>
 
   <!-- Secca banner -->
   <div id="secca-banner">⚠ ACQUA BASSA — RALLENTARE ⚠</div>
@@ -1322,32 +1331,47 @@ function startGPS() {
       const newLon = pos.coords.longitude;
       const nowMs = Date.now();
 
-      // ─── SPEED: prefer GPS-reported speed, but iOS Safari often returns null.
-      //     Fallback: compute from haversine distance / dt between consecutive points.
-      let speedMs = pos.coords.speed;
-      if (speedMs == null || isNaN(speedMs) || speedMs < 0) {
-        if (state.lat != null && state.lon != null && state.lastFixMs) {
-          const dist = haversine(state.lat, state.lon, newLat, newLon);  // meters
-          const dt = (nowMs - state.lastFixMs) / 1000;                    // seconds
-          if (dt > 0.2 && dt < 30) {
-            speedMs = dist / dt;
-            // Sanity clamp: ignore huge jumps (GPS glitch)
-            if (speedMs > 80) speedMs = state.speed || 0;
-          } else {
-            speedMs = state.speed || 0;
-          }
+      // ─── SPEED: ALWAYS compute from haversine distance / dt between successive GPS fixes.
+      //     iOS Safari's pos.coords.speed is unreliable (often null or 0 even when moving).
+      let speedMs = 0;
+      let dist = 0, dt = 0;
+      if (state.lat != null && state.lon != null && state.lastFixMs) {
+        dist = haversine(state.lat, state.lon, newLat, newLon);  // meters
+        dt = (nowMs - state.lastFixMs) / 1000;                    // seconds
+        if (dt > 0.2 && dt < 30 && dist >= 0) {
+          speedMs = dist / dt;
+          // Clamp absurd values (GPS glitches)
+          if (speedMs > 80) speedMs = state.speed || 0;
         } else {
-          speedMs = 0;
+          speedMs = state.speed || 0;
         }
       }
+      // Use GPS-reported speed as a tiebreaker if it's reasonable and we don't have a good haversine reading
+      const reportedMs = pos.coords.speed;
+      if (speedMs === 0 && reportedMs && reportedMs > 0 && reportedMs < 80) {
+        speedMs = reportedMs;
+      }
+
       // Smooth: blend with previous reading to reduce GPS jitter
       const prevSpeed = state.speed || 0;
-      const smoothed = prevSpeed * 0.4 + speedMs * 0.6;
+      const smoothed = prevSpeed * 0.3 + speedMs * 0.7;
       state.speed = smoothed;
       state.lastFixMs = nowMs;
       state.lat = newLat;
       state.lon = newLon;
       state.gpsReady = true;
+
+      // ── Debug panel update (toggle visible by tapping GPS status badge)
+      const dbg = document.getElementById('gps-debug');
+      if (dbg && dbg.classList.contains('on')) {
+        dbg.innerHTML =
+          '<div>raw speed: ' + (reportedMs == null ? 'null' : reportedMs.toFixed(2) + ' m/s') + '</div>' +
+          '<div>computed: ' + speedMs.toFixed(2) + ' m/s = ' + (speedMs * 3.6).toFixed(1) + ' km/h</div>' +
+          '<div>smoothed: ' + smoothed.toFixed(2) + ' m/s = ' + (smoothed * 3.6).toFixed(1) + ' km/h</div>' +
+          '<div>dist: ' + dist.toFixed(1) + 'm  dt: ' + dt.toFixed(2) + 's</div>' +
+          '<div>acc: ' + (pos.coords.accuracy ? pos.coords.accuracy.toFixed(0) + 'm' : '?') + '</div>' +
+          '<div>fix #: ' + (state.fixCount = (state.fixCount || 0) + 1) + '</div>';
+      }
 
       // ─── COMPASS MODE: rotate map to GPS heading ───
       const heading = pos.coords.heading;
@@ -1397,7 +1421,7 @@ function startGPS() {
       document.getElementById('gps-status').textContent = '● NO GPS';
       document.getElementById('gps-status').className = 'gps-none';
     },
-    { enableHighAccuracy: true, maximumAge: 1000, timeout: 5000 }
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 8000 }
   );
 }
 
