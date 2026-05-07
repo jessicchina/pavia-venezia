@@ -177,9 +177,10 @@
   #btn-secca.active { animation: flashRed 0.4s infinite alternate; }
   #btn-mappa { background: var(--bg3); color: var(--green); border: 1px solid rgba(0,255,136,0.3); font-size: 11px; }
   #btn-panel { background: var(--bg3); color: var(--cyan); border: 1px solid rgba(0,212,255,0.3); font-size: 11px; }
-  #btn-registra { background: var(--bg3); color: #ff7b1c; border: 1px solid rgba(255,123,28,0.4); font-size: 10px; }
-  #btn-registra.recording { background: #ff7b1c; color: #000; border-color: #ff7b1c; animation: recBlink 1.2s infinite; }
-  #btn-esporta { background: var(--bg3); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); font-size: 10px; }
+  #btn-registra { background: var(--bg3); color: #ff7b1c; border: 1px solid rgba(255,123,28,0.4); font-size: 10px; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: rgba(255,123,28,0.5); }
+  #btn-registra.recording { background: #ff7b1c; color: #000; border: 2px solid #ff3b3b; box-shadow: 0 0 12px rgba(255,59,59,0.6); }
+  #btn-registra.recording:active { background: #cc5e0e; }
+  #btn-esporta { background: var(--bg3); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); font-size: 10px; cursor: pointer; touch-action: manipulation; }
   #btn-esporta:disabled { opacity: 0.35; cursor: not-allowed; }
   @keyframes recBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
   #rec-indicator {
@@ -1057,6 +1058,7 @@ const BATHYMETRIC = [{"lat":44.912383,"lon":10.534235,"cod":"36","nome":"VALLE F
 let state = {
   lat: null, lon: null,
   speed: 0, maxSpeed: 0,
+  lastFixMs: null,   // timestamp of last GPS fix (ms) — used to compute speed when GPS doesn't report it
   kmCovered: 0,
   nextWptIdx: 1,
   lastAlertKm: {},   // wptIdx -> last alert distance triggered
@@ -1316,19 +1318,44 @@ function startGPS() {
   }
   watchId = navigator.geolocation.watchPosition(
     (pos) => {
-      state.lat = pos.coords.latitude;
-      state.lon = pos.coords.longitude;
+      const newLat = pos.coords.latitude;
+      const newLon = pos.coords.longitude;
+      const nowMs = Date.now();
+
+      // ─── SPEED: prefer GPS-reported speed, but iOS Safari often returns null.
+      //     Fallback: compute from haversine distance / dt between consecutive points.
+      let speedMs = pos.coords.speed;
+      if (speedMs == null || isNaN(speedMs) || speedMs < 0) {
+        if (state.lat != null && state.lon != null && state.lastFixMs) {
+          const dist = haversine(state.lat, state.lon, newLat, newLon);  // meters
+          const dt = (nowMs - state.lastFixMs) / 1000;                    // seconds
+          if (dt > 0.2 && dt < 30) {
+            speedMs = dist / dt;
+            // Sanity clamp: ignore huge jumps (GPS glitch)
+            if (speedMs > 80) speedMs = state.speed || 0;
+          } else {
+            speedMs = state.speed || 0;
+          }
+        } else {
+          speedMs = 0;
+        }
+      }
+      // Smooth: blend with previous reading to reduce GPS jitter
+      const prevSpeed = state.speed || 0;
+      const smoothed = prevSpeed * 0.4 + speedMs * 0.6;
+      state.speed = smoothed;
+      state.lastFixMs = nowMs;
+      state.lat = newLat;
+      state.lon = newLon;
       state.gpsReady = true;
 
       // ─── COMPASS MODE: rotate map to GPS heading ───
       const heading = pos.coords.heading;
-      if (window.compassMode && mappaLeaflet && heading !== null && !isNaN(heading) && (pos.coords.speed || 0) > 1.0) {
-        // Only rotate when actually moving (>1 m/s) — heading is unreliable when stopped
-        try { mappaLeaflet.setBearing(-heading); } catch(e) {} // negate so heading-up
+      if (window.compassMode && mappaLeaflet && heading !== null && !isNaN(heading) && smoothed > 1.0) {
+        try { mappaLeaflet.setBearing(-heading); } catch(e) {}
       }
 
-      const speedMs = pos.coords.speed || 0;
-      const speedKmh = speedMs * 3.6;
+      const speedKmh = smoothed * 3.6;
 
       // Update speed in map view header (when map is open)
       const mappaSpeedEl = document.getElementById('mappa-speed-val');
