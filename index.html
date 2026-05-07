@@ -1320,11 +1320,31 @@ function updateNextWaypoint(kmCovered) {
 let watchId = null;
 
 function startGPS() {
+  const gpsEl = document.getElementById('gps-status');
   if (!navigator.geolocation) {
-    document.getElementById('gps-status').textContent = '● NO GPS';
-    document.getElementById('gps-status').className = 'gps-none';
+    gpsEl.textContent = '● NO GPS';
+    gpsEl.className = 'gps-none';
     return;
   }
+  // Show "searching" state while waiting for first fix (iOS can take 30+s on a boat)
+  gpsEl.textContent = '● CERCO GPS...';
+  gpsEl.className = 'gps-weak';
+
+  // Quick first-fix attempt with low accuracy (cell tower based) — usually returns in 2-5s
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      // Got a quick rough fix. Update display immediately so user sees the app working.
+      state.lat = pos.coords.latitude;
+      state.lon = pos.coords.longitude;
+      state.lastFixMs = Date.now();
+      state.gpsReady = true;
+      gpsEl.textContent = '● GPS~';
+      gpsEl.className = 'gps-weak';
+    },
+    (err) => { /* ignore — watchPosition will try high-accuracy */ },
+    { enableHighAccuracy: false, maximumAge: 60000, timeout: 10000 }
+  );
+
   watchId = navigator.geolocation.watchPosition(
     (pos) => {
       const newLat = pos.coords.latitude;
@@ -1390,9 +1410,11 @@ function startGPS() {
 
       const acc = pos.coords.accuracy;
       const gpsEl = document.getElementById('gps-status');
-      if (acc < 15) { gpsEl.textContent = '● GPS'; gpsEl.className = 'gps-ok'; }
-      else if (acc < 40) { gpsEl.textContent = '● GPS~'; gpsEl.className = 'gps-weak'; }
-      else { gpsEl.textContent = '● GPS?'; gpsEl.className = 'gps-none'; }
+      // Forgiving badge: any successful fix → GREEN. Red only if no fix in 30s (handled below).
+      if (acc < 15)       gpsEl.textContent = '● GPS';
+      else if (acc < 40)  gpsEl.textContent = '● GPS~';
+      else                gpsEl.textContent = '● GPS (' + Math.round(acc) + 'm)';
+      gpsEl.className = 'gps-ok';
 
       // Track recording — append point if recording is active (rate-limited to ~2s)
       if (window.recState && window.recState.active) {
@@ -1418,11 +1440,33 @@ function startGPS() {
       }
     },
     (err) => {
-      document.getElementById('gps-status').textContent = '● NO GPS';
-      document.getElementById('gps-status').className = 'gps-none';
+      const gpsEl = document.getElementById('gps-status');
+      // err.code: 1=PERMISSION_DENIED, 2=POSITION_UNAVAILABLE, 3=TIMEOUT
+      const codeMap = {1: 'NO PERMESSO', 2: 'NO SEGNALE', 3: 'TIMEOUT'};
+      gpsEl.textContent = '● ' + (codeMap[err.code] || 'GPS ERR ' + err.code);
+      gpsEl.className = 'gps-none';
+      // Show error in debug panel too
+      const dbg = document.getElementById('gps-debug');
+      if (dbg) {
+        dbg.innerHTML = '<div style="color:#ff6b6b">GPS ERR ' + err.code + '</div>' +
+                        '<div style="color:#ff6b6b;font-size:10px">' + (err.message || '') + '</div>';
+      }
+      // If TIMEOUT or POSITION_UNAVAILABLE, watchPosition keeps trying internally — don't stop
     },
-    { enableHighAccuracy: true, maximumAge: 0, timeout: 8000 }
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 }  // 30s — iOS can be slow on first fix
   );
+
+  // Watchdog: every 5 seconds check if we're still getting GPS fixes.
+  // If no fix in the last 30 seconds, show red badge.
+  if (window._gpsWatchdog) clearInterval(window._gpsWatchdog);
+  window._gpsWatchdog = setInterval(() => {
+    const gpsEl = document.getElementById('gps-status');
+    if (!gpsEl) return;
+    if (state.lastFixMs && Date.now() - state.lastFixMs > 30000) {
+      gpsEl.textContent = '● NO GPS';
+      gpsEl.className = 'gps-none';
+    }
+  }, 5000);
 }
 
 // ═══════════════════════════════════════════════
