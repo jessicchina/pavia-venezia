@@ -124,7 +124,8 @@
   #speed-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; position: absolute; top: 8px; left: 16px; }
   #speed-value { font-size: 88px; font-weight: 900; line-height: 1; color: var(--cyan); letter-spacing: -2px; margin-top: 16px; }
   #speed-unit { font-size: 20px; font-weight: 700; color: var(--muted); margin-bottom: 10px; }
-  #max-speed { position: absolute; top: 8px; right: 16px; font-size: 12px; color: var(--muted); font-weight: 600; }
+  #max-speed { position: absolute; top: 8px; right: 16px; font-size: 18px; color: #ffd700; font-weight: 900; letter-spacing: 1px; cursor: pointer; }
+  #max-speed:active { opacity: 0.6; }
 
   /* Progress Row */
   #progress-block {
@@ -443,7 +444,7 @@
     <!-- Speed -->
     <div id="speed-block">
       <div id="speed-label">VELOCITÀ</div>
-      <div id="max-speed">MAX: 0 km/h</div>
+      <div id="max-speed" onclick="if(confirm('Azzerare velocità massima?')){state.maxSpeed=0;try{localStorage.removeItem('mattia_maxSpeed');}catch(e){}this.textContent='MAX: 0 km/h';var m=document.getElementById('mappa-max-val');if(m)m.textContent='0';}">MAX: 0 km/h</div>
       <div id="speed-value">0</div>
       <div id="speed-unit">km/h</div>
     </div>
@@ -522,9 +523,10 @@
       <button id="mappa-close" onclick="hideMappa()">✕</button>
     </div>
     <div id="leaflet-map"></div>
-    <div id="mappa-speed-overlay" style="position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:1100;pointer-events:none;background:rgba(0,0,0,0.65);padding:4px 16px 6px;border-radius:10px;border:2px solid #ff7b1c;line-height:1;font-family:'Barlow Condensed';font-weight:900;color:#ff7b1c;text-shadow:0 0 4px rgba(0,0,0,0.7);">
+    <div id="mappa-speed-overlay" style="position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:1100;pointer-events:auto;cursor:pointer;background:rgba(0,0,0,0.65);padding:4px 16px 6px;border-radius:10px;border:2px solid #ff7b1c;line-height:1;font-family:'Barlow Condensed';font-weight:900;color:#ff7b1c;text-shadow:0 0 4px rgba(0,0,0,0.7);text-align:center;" onclick="if(confirm('Azzerare velocità massima?')){state.maxSpeed=0;try{localStorage.removeItem('mattia_maxSpeed');}catch(e){}document.getElementById('max-speed').textContent='MAX: 0 km/h';document.getElementById('mappa-max-val').textContent='0';}">
       <span id="mappa-speed-val" style="font-size:62px;letter-spacing:2px;">0</span>
       <span style="font-size:18px;color:#ffb380;font-weight:800;margin-left:4px;">km/h</span>
+      <div style="font-size:14px;color:#ffd700;font-weight:700;letter-spacing:1px;margin-top:2px;text-shadow:0 0 3px rgba(0,0,0,0.8);">MAX: <span id="mappa-max-val">0</span> km/h</div>
     </div>
 
     <div id="mappa-info" class="empty">Tocca un punto per vederne i dettagli</div>
@@ -1355,27 +1357,49 @@ function startGPS() {
       //     iOS Safari's pos.coords.speed is unreliable (often null or 0 even when moving).
       let speedMs = 0;
       let dist = 0, dt = 0;
+      const acc = pos.coords.accuracy || 20;
       if (state.lat != null && state.lon != null && state.lastFixMs) {
         dist = haversine(state.lat, state.lon, newLat, newLon);  // meters
         dt = (nowMs - state.lastFixMs) / 1000;                    // seconds
         if (dt > 0.2 && dt < 30 && dist >= 0) {
-          speedMs = dist / dt;
-          // Clamp absurd values (GPS glitches)
-          if (speedMs > 80) speedMs = state.speed || 0;
+          // STATIONARY FILTER: if movement is smaller than the GPS accuracy radius,
+          // it's almost certainly noise — not real motion. Force speed = 0.
+          // Also require minimum 2m absolute movement to count as real.
+          const noiseThreshold = Math.max(acc * 0.5, 2);
+          if (dist < noiseThreshold) {
+            speedMs = 0;
+          } else {
+            speedMs = dist / dt;
+            // Clamp absurd values (GPS glitches)
+            if (speedMs > 80) speedMs = state.speed || 0;
+          }
         } else {
           speedMs = state.speed || 0;
         }
       }
-      // Use GPS-reported speed as a tiebreaker if it's reasonable and we don't have a good haversine reading
+      // Use GPS-reported speed as a tiebreaker only if it's REASONABLE and we computed 0 but moved a bit
       const reportedMs = pos.coords.speed;
-      if (speedMs === 0 && reportedMs && reportedMs > 0 && reportedMs < 80) {
+      if (speedMs === 0 && reportedMs && reportedMs > 1.0 && reportedMs < 80 && dist > 2) {
         speedMs = reportedMs;
       }
 
       // Smooth: blend with previous reading to reduce GPS jitter
       const prevSpeed = state.speed || 0;
-      const smoothed = prevSpeed * 0.3 + speedMs * 0.7;
+      // Heavier smoothing when slow (filters out spike-y noise), less when fast (responsive)
+      const smoothFactor = speedMs < 2 ? 0.85 : 0.4;
+      const smoothed = prevSpeed * smoothFactor + speedMs * (1 - smoothFactor);
       state.speed = smoothed;
+
+      // ─── TRACK MAX SPEED ───
+      const kmhNow = smoothed * 3.6;
+      if (kmhNow > (state.maxSpeed || 0)) {
+        state.maxSpeed = kmhNow;
+        try { localStorage.setItem('mattia_maxSpeed', String(kmhNow)); } catch(e) {}
+        const maxEl = document.getElementById('max-speed');
+        if (maxEl) maxEl.textContent = 'MAX: ' + Math.round(kmhNow) + ' km/h';
+        const mapMaxEl = document.getElementById('mappa-max-val');
+        if (mapMaxEl) mapMaxEl.textContent = Math.round(kmhNow);
+      }
       state.lastFixMs = nowMs;
       state.lat = newLat;
       state.lon = newLon;
@@ -1614,13 +1638,23 @@ async function exportTrackGPX() {
   alert(pts.length + ' punti scaricati come ' + fileName + '.\nIl file è in Files → Download.');
 }
 
-// Restore recording state on load (track persists in localStorage across app reloads)
+// Restore recording state + max speed on load
 window.addEventListener('load', () => {
   try {
     const saved = localStorage.getItem('mattia_track');
     if (saved) {
       const pts = JSON.parse(saved) || [];
       if (pts.length > 0) window.recState.points = pts;
+    }
+  } catch(e) {}
+  try {
+    const savedMax = parseFloat(localStorage.getItem('mattia_maxSpeed') || '0');
+    if (savedMax > 0) {
+      state.maxSpeed = savedMax;
+      const maxEl = document.getElementById('max-speed');
+      if (maxEl) maxEl.textContent = 'MAX: ' + Math.round(savedMax) + ' km/h';
+      const mapMaxEl = document.getElementById('mappa-max-val');
+      if (mapMaxEl) mapMaxEl.textContent = Math.round(savedMax);
     }
   } catch(e) {}
   updateExportButton();
