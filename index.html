@@ -1432,6 +1432,7 @@ function startGPS() {
       const kmEst = estimateKmFromGPS(state.lat, state.lon);
       updateDisplay(kmEst, speedKmh);
 
+      const acc = pos.coords.accuracy;
       const gpsEl = document.getElementById('gps-status');
       // Forgiving badge: any successful fix → GREEN. Red only if no fix in 30s (handled below).
       if (acc < 15)       gpsEl.textContent = '● GPS';
