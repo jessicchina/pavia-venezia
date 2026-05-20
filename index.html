@@ -1847,13 +1847,24 @@ function buildMappa() {
 
   // ─── Waypoint markers with our severity styling ───
   WAYPOINTS.forEach((w, i) => {
-    const cls = mappaWptClass(w);
-    const icon = L.divIcon({
-      className: 'raid-leaflet-icon',
-      html: `<div class="raid-m ${cls}"></div>`,
-      iconSize: cls === 'critical' ? [22, 22] : [16, 16],
-      iconAnchor: cls === 'critical' ? [11, 11] : [8, 8],
-    });
+    let icon;
+    // ─── Special icon for FINE GARA (km 352): checkered race flag instead of dot ───
+    if (w.type === 'finish') {
+      icon = L.icon({
+        iconUrl: 'data/icons/finish-flag.svg',
+        iconSize:   [36, 50],
+        iconAnchor: [12, 50],   // bottom of pole at the lat/lon
+        popupAnchor:[6, -46],
+      });
+    } else {
+      const cls = mappaWptClass(w);
+      icon = L.divIcon({
+        className: 'raid-leaflet-icon',
+        html: `<div class="raid-m ${cls}"></div>`,
+        iconSize: cls === 'critical' ? [22, 22] : [16, 16],
+        iconAnchor: cls === 'critical' ? [11, 11] : [8, 8],
+      });
+    }
     const marker = L.marker([w.lat, w.lon], { icon, title: w.name }).addTo(mappaLeaflet);
 
     // Popup with full safety info — km, type, name, voice alert
