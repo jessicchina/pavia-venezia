@@ -1432,9 +1432,9 @@ function startGPS() {
       const kmEst = estimateKmFromGPS(state.lat, state.lon);
       updateDisplay(kmEst, speedKmh);
 
-      const acc = pos.coords.accuracy;
       const gpsEl = document.getElementById('gps-status');
       // Forgiving badge: any successful fix → GREEN. Red only if no fix in 30s (handled below).
+      // Note: `acc` is already declared above (in the speed-jitter filter).
       if (acc < 15)       gpsEl.textContent = '● GPS';
       else if (acc < 40)  gpsEl.textContent = '● GPS~';
       else                gpsEl.textContent = '● GPS (' + Math.round(acc) + 'm)';
