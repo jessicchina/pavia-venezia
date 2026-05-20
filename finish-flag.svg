@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 50" width="32" height="50">
+  <!-- Brown base -->
+  <rect x="6" y="42" width="20" height="6" rx="1" fill="#8B4513" stroke="#000" stroke-width="0.6"/>
+  <!-- White pole -->
+  <rect x="6" y="2" width="3" height="42" fill="#fff" stroke="#000" stroke-width="0.5"/>
+  <!-- Flag border -->
+  <rect x="9" y="2" width="22" height="16" fill="#fff" stroke="#000" stroke-width="0.8"/>
+  <!-- Checker pattern: 5 cols x 3 rows, each cell 4.4 x 5.33 -->
+  <!-- Row 0 (top) -->
+  <rect x="9"     y="2"    width="4.4" height="5.33" fill="#000"/>
+  <rect x="17.8"  y="2"    width="4.4" height="5.33" fill="#000"/>
+  <rect x="26.6"  y="2"    width="4.4" height="5.33" fill="#000"/>
+  <!-- Row 1 (middle) — offset -->
+  <rect x="13.4"  y="7.33" width="4.4" height="5.33" fill="#000"/>
+  <rect x="22.2"  y="7.33" width="4.4" height="5.33" fill="#000"/>
+  <!-- Row 2 (bottom) -->
+  <rect x="9"     y="12.66" width="4.4" height="5.33" fill="#000"/>
+  <rect x="17.8"  y="12.66" width="4.4" height="5.33" fill="#000"/>
+  <rect x="26.6"  y="12.66" width="4.4" height="5.33" fill="#000"/>
+</svg>
